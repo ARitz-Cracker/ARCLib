@@ -19,10 +19,10 @@ end
 
 -- This is taken from Swep Contruction Kit
 -- Works like table.Copy except that any tables within the tables will also get copied instead of just their pointers.
--- Don't use this for a table that contains itself down the line or you'll get an infinit loop
+-- Don't use this for a table that contains itself down the line or you'll get an infinite loop
 function table.FullCopy( tab )
 
-	if (!tab) then return nil end
+	if (!istable(tab)) then return nil end
 	
 	local res = {}
 	for k, v in pairs( tab ) do
@@ -35,6 +35,19 @@ function table.FullCopy( tab )
 		else
 			res[k] = v
 		end
+	end
+	
+	return res
+	
+end
+
+-- What if I want all the objects inside this table to be same object, huh?
+function table.LiteCopy( tab )
+	if (!istable(tab)) then return nil end
+	
+	local res = {}
+	for k, v in pairs( tab ) do
+		res[k] = v
 	end
 	
 	return res
