@@ -99,7 +99,7 @@ function ARCLib.SplitString(str,num) -- Splits a string at every num characters
 	return result
 end
 
-if !CLIENT then return end -- The following code only functions on the client side since only the client has those surface. functions
+if !CLIENT then return end -- The following code only functions on the client side since only the client has those surface.* functions
 
 if timer.Exists( "ARCLib_DumpCachedStrings" ) then
 	timer.Destroy( "ARCLib_DumpCachedStrings" )
@@ -138,206 +138,165 @@ function ARCLib.CutOutText(text,font,length) -- Makes the trailing "..." if the 
 end
 
 -- The following 2 functions do the same thing, they are mostly used by my 3D2D displays when I want to fit something in a box. One tries to do it all within the same frame, the other one does it in chunks so the game doesn't freeze.
--- I honestly want to try re-coding these functions some time as they are pretty... hack-ish
 
 
-function ARCLib.FitText(text,font,length) -- Splits strings for text boxes. (length) is in pix. Supports "\n"
--- TODO: Support UTF-8 characters
-if !isstring(text) then return {type(text)} end
---Note: This is a pretty messy thing. DON'T USE EVERY FRAME FOR LOADSA TEXT!
-	if ARCLib.CachedStrings[util.CRC(text..font..length)] then -- I wonder if this will actually save performence...
-		return ARCLib.CachedStrings[util.CRC(text..font..length)]
-	end
-
-	text = string.Replace(text,"\r","") -- What if we're reading a file with \r\n?
-	text = string.Replace(text,"\n"," \n")
-	surface.SetFont( font )
-	local badword = ""
-	local OKToGo = true
-	local strings = string.Explode(" ",text)
-	for k, v in pairs(strings) do -- Quick n' dirty fix TODO: Make it so that strings bigger than length get split at the vowel or something
-		strings[k] = v.." "
-		local badstring , _ = surface.GetTextSize(strings[k])
-		if badstring > length then
-			OKToGo = false
-			badword = tostring(strings[k])
+local function ARCLib_CorrectStringTooLargeForTable(word,tab,place,font,length)
+	local temptables = {}
+	local tempstr = ""
+	local tempstrsize = 0
+	local charsize = 0
+	for i=1,#word do
+		charsize = surface.GetTextSize(word[i])
+		if (charsize+tempstrsize <= length) then
+			tempstr = tempstr..word[i]
+			tempstrsize = charsize+tempstrsize
+		else
+			temptables[#temptables + 1] = tempstr
+			tempstr = word[i]
+			tempstrsize = charsize
 		end
 	end
-	
-	if OKToGo then
-		local tempstring = ""
-		local fittedstrings = {}
-		local i = 1
-		while #strings > 0 do
-			--MsgN(#strings)
-			local tempstringlen , _ = surface.GetTextSize(tempstring)
-			local string1len , _ = surface.GetTextSize(strings[1])
-			--MsgN(tempstringlen.."+"..string1len.." <= "..length.." && "..strings[1])
-			while (tempstringlen+string1len <= length) && strings[1] do
-				
-				tempstring = tempstring .. table.remove( strings, 1 )
-				tempstringlen , _ = surface.GetTextSize(tempstring)
-				if strings[1] then
-					string1len , _ = surface.GetTextSize(strings[1])
-				else
-					string1len = 0
-				end
-			end
-			fittedstrings[i] = tempstring
-			tempstring = ""
-			i = i + 1
-		end
-		i = #fittedstrings
-		while i > 0 do
-			local newlinecheck = string.Explode("\n",fittedstrings[i])
-			table.remove(fittedstrings,i)
-			local ii = #newlinecheck
-			while ii > 0 do
-				table.insert(fittedstrings,i,newlinecheck[ii])
-				ii = ii - 1
-			end
-			i = i - 1
-		end
-		while table.HasValue(fittedstrings,"") do -- Some checks to make sure everything is right
-			table.RemoveByValue(fittedstrings,"")
-		end
-		while table.HasValue(fittedstrings," ") do
-			table.RemoveByValue(fittedstrings," ")
-		end
-		--if #text < 2097152 then
-			
-			ARCLib.CachedStrings[util.CRC(text..font..length) ] = fittedstrings
-		--end
-		return fittedstrings
-	else
-		return {"Word too long.","("..badword..")"}
+	for i=1,#temptables do
+		place = place + 1
+		tab[place] = temptables[i]
 	end
+	place = place + 1
+	tab[place] = tempstr
+	return place
 end
 
-ARCLib.StringThinkPhase = 0
-ARCLib.StringThink_Strings = {}
-ARCLib.StringThink_i = 1
-ARCLib.StringThink_fittedstrings = {}
-ARCLib.StringThink_callback = nil
-ARCLib.StringThink_Percent = 0
-ARCLib.StringThink_tempstring = ""
-ARCLib.StringThink_length = 0
-ARCLib.StringThink_tempstringlen = nil
-ARCLib.StringThink_string1len = nil
-ARCLib.StringThink_font = ""
+function ARCLib.FitText(text,font,length,incoroutine)
+	if !isstring(text) then return {type(text)} end
+	local hash
+	if !incoroutine then
+		hash = util.CRC(text..font..length)
+		if ARCLib.CachedStrings[hash] then -- I wonder if this will actually save performence...
+			return ARCLib.CachedStrings[hash]
+		end
+	end
+	text = string.Replace(text,"\r","") -- What if we're reading a file with \r\n?
+	local textlen = #text
+	if text[textlen] != " " || text[textlen] != "\n" then
+		textlen = textlen + 1
+		text = text.." " -- This is here so that the last word doesn't get left behind :)
+	end
+	
+	local textprogress = 0
+	
+	local resulttab = {""}
+	local curplace = 1
+	local currentword = ""
+	local currentwordsize = 0
+	local currentlinesize = 0
+	surface.SetFont( font )
+	local spacelen = surface.GetTextSize( " " )
+	for k,v in utf8.codes(text) do
+		if (v == " ") then
+			MsgN("curplace = "..curplace)
+			PrintTable(resulttab)
+			currentlinesize = surface.GetTextSize( resulttab[curplace] )
+			currentwordsize = surface.GetTextSize( currentword )
+			if (currentwordsize > length) then -- WORD IS LONGER THAN THE LENGTH OF THE SCREEN AAAAAAAAAAAAAAAAH
+				curplace = ARCLib_CorrectStringTooLargeForTable(currentword,resulttab,curplace,font,length)
+			elseif (currentlinesize == 0) then
+				resulttab[curplace] = currentword
+			elseif (currentlinesize+currentwordsize+spacelen <= length) then
+				resulttab[curplace] = resulttab[curplace].." "..currentword
+			else
+				curplace = curplace + 1
+				resulttab[curplace] = currentword
+			end
+			currentword = ""
+		elseif (v == "\n") then
+			currentlinesize = surface.GetTextSize( resulttab[curplace] )
+			currentwordsize = surface.GetTextSize( currentword )
+			if (currentwordsize > length) then -- WORD IS LONGER THAN THE LENGTH OF THE SCREEN AAAAAAAAAAAAAAAAH
+				curplace = ARCLib_CorrectStringTooLargeForTable(currentword,resulttab,curplace,font,length)
+			elseif (currentlinesize == 0) then
+				resulttab[curplace] = currentword
+			elseif (currentlinesize+currentwordsize+spacelen <= length) then
+				resulttab[curplace] = resulttab[curplace].." "..currentword
+			else
+				curplace = curplace + 1
+				resulttab[curplace] = currentword
+			end
+			curplace = curplace + 1
+			resulttab[curplace] = ""
+			currentword = ""
+		else
+			currentword = currentword..v
+		end
+		if incoroutine then
+			textprogress = textprogress + #v
+			ARCLib.CR.Progress = textprogress/textlen
+			coroutine.yield()
+		end
+	end
+	if !incoroutine then
+		ARCLib.CachedStrings[hash] = resulttab
+	end
+	return resulttab
+end
+
+local NULLTABLE = {}
+
+ARCLib.CR = {}
+ARCLib.CR.Progress = -1
+ARCLib.CR.Callback = nil
+ARCLib.CR.Text = ""
+ARCLib.CR.Font = ""
+ARCLib.CR.Length = 0
+ARCLib.CR.Thread = nil
+local function ARCLib_CRFunc()
+	ARCLib.CR.Progress = 0
+	ARCLib.CR.Table = ARCLib.FitText(ARCLib.CR.Text,ARCLib.CR.Font,ARCLib.CR.Length,true)
+	ARCLib.CR.Text = ""
+	ARCLib.CR.Font = ""
+	ARCLib.CR.Length = 0
+	ARCLib.CR.Progress = 1
+end
+
 function ARCLib.FitTextRealtime(text,font,length,callback) -- Splits strings for text boxes. (length) is in pix. Supports "\n"
 	-- Realtime version, this was made so that your computer doesn't freeze while processing massive amounts of text.
-	-- TODO: Support UTF-8 characters
-	if !isstring(text) then 
-		callback(1,{type(text)})
-		return
+	if (ARCLib.CR.Callback) then
+		return ARCLib.CR.Callback(1,{"BUSY"})
 	end
-	if ARCLib.StringThinkPhase > 0 then
-		callback(1,{"Busy"})
-		return
-	end
-	text = string.Replace(text,"\r","")
-	text = string.Replace(text,"\n"," \n")
-	surface.SetFont( font )
-	ARCLib.StringThink_font = font
-	local badword = ""
-	local OKToGo = true
-	ARCLib.StringThink_Strings = string.Explode(" ",text)
-	for k, v in pairs(ARCLib.StringThink_Strings) do -- Quick n' dirty fix TODO: Make it so that strings bigger than length get split at the vowel or something
-		ARCLib.StringThink_Strings[k] = v.." "
-		local badstring , _ = surface.GetTextSize(ARCLib.StringThink_Strings[k])
-		if badstring > length then
-			OKToGo = false
-			badword = tostring(ARCLib.StringThink_Strings[k])
-		end
-	end
-	
-	if OKToGo then
-		ARCLib.StringThink_callback = callback
-		ARCLib.StringThinkPhase = 1
-		ARCLib.StringThink_length = length
-	else
-		callback(1,{"Word too long.","("..badword..")"})
-	end
+	ARCLib.CR.Text = text
+	ARCLib.CR.Font = font
+	ARCLib.CR.Length = length
+	ARCLib.CR.Callback = callback
 end
 hook.Add( "Think", "ARCLib Stringthink", function()
-	if ARCLib.StringThinkPhase == 1 then
-		--MsgN("ARCLib.StringThinkPhase 1")
-		ARCLib.StringThink_tempstring = ""
-		ARCLib.StringThink_fittedstrings = {}
-		ARCLib.StringThink_i = 1
-		ARCLib.StringThinkPhase = 2
-		ARCLib.LoadPerBase = #ARCLib.StringThink_Strings
-	elseif ARCLib.StringThinkPhase == 2 then---
-		--MsgN("ARCLib.StringThinkPhase 2")
-		local stime = SysTime()
-		while SysTime() - stime < 0.01 do
-			if #ARCLib.StringThink_Strings > 0 then
-				--MsgN(#ARCLib.StringThink_Strings)
-				surface.SetFont( ARCLib.StringThink_font )
-				ARCLib.StringThink_tempstringlen , _ = surface.GetTextSize(ARCLib.StringThink_tempstring)
-				ARCLib.StringThink_string1len , _ = surface.GetTextSize(ARCLib.StringThink_Strings[1])
-				while (ARCLib.StringThink_tempstringlen+ARCLib.StringThink_string1len <= ARCLib.StringThink_length) && ARCLib.StringThink_Strings[1] do
-					ARCLib.StringThink_tempstring = ARCLib.StringThink_tempstring .. table.remove( ARCLib.StringThink_Strings, 1 )
-					ARCLib.StringThink_tempstringlen , _ = surface.GetTextSize(ARCLib.StringThink_tempstring)
-					if ARCLib.StringThink_Strings[1] then
-						ARCLib.StringThink_string1len , _ = surface.GetTextSize(ARCLib.StringThink_Strings[1])
-					else
-						ARCLib.StringThink_string1len = 0
+	if ARCLib.CR.Callback then
+		local done = false
+		if ARCLib.CR.Progress == -1 then
+			ARCLib.CR.Thread = coroutine.create(ARCLib_CRFunc) 
+			ARCLib.CR.Progress = 0
+			ARCLib.CR.Callback(0,NULLTABLE)
+		else
+			local stime = SysTime()
+			while SysTime() - stime < 0.01 do
+				if (coroutine.status(ARCLib.CR.Thread) == "dead") then
+					ARCLib.CR.Callback(1,ARCLib.CR.Table)
+					ARCLib.CR.Progress = -1
+					ARCLib.CR.Callback = nil
+					ARCLib.CR.Text = ""
+					ARCLib.CR.Font = ""
+					ARCLib.CR.Length = 0
+					ARCLib.CR.Thread = nil
+					done = true
+					break
+				else
+					local succ,err = coroutine.resume(ARCLib.CR.Thread)
+					if !succ then
+						error("ARCLib.FitTextRealtime coroutine failed: "..err)
 					end
 				end
-				
-				ARCLib.StringThink_fittedstrings[ARCLib.StringThink_i] = ARCLib.StringThink_tempstring
-				ARCLib.StringThink_tempstring = ""
-				ARCLib.StringThink_i = ARCLib.StringThink_i + 1
-			else
-				ARCLib.StringThinkPhase = 3
+			end
+			if (!done) then
+				ARCLib.CR.Callback(ARCLib.CR.Progress,NULLTABLE)
 			end
 		end
-		local per = (#ARCLib.StringThink_Strings/ARCLib.LoadPerBase - 1)*-1
-		ARCLib.StringThink_callback(per*0.5,"Loading... ("..math.floor(per * 50).."%)")
-	elseif ARCLib.StringThinkPhase == 3 then
-		--MsgN("ARCLib.StringThinkPhase 3")
-		ARCLib.LoadPerBase = #ARCLib.StringThink_fittedstrings
-		ARCLib.StringThink_i = #ARCLib.StringThink_fittedstrings
-		ARCLib.StringThinkPhase = 4
-	elseif ARCLib.StringThinkPhase == 4 then
-		--MsgN("ARCLib.StringThinkPhase 4")
-		local stime = SysTime()
-		while SysTime() - stime < 0.01 do
-			if ARCLib.StringThink_i > 0 then
-				--MsgN(ARCLib.StringThink_i)
-				local newlinecheck = string.Explode("\n",ARCLib.StringThink_fittedstrings[ARCLib.StringThink_i])
-				table.remove(ARCLib.StringThink_fittedstrings,ARCLib.StringThink_i)
-				local ii = #newlinecheck
-				while ii > 0 do
-					table.insert(ARCLib.StringThink_fittedstrings,ARCLib.StringThink_i,newlinecheck[ii])
-					ii = ii - 1
-				end
-				ARCLib.StringThink_i = ARCLib.StringThink_i - 1
-			else
-				ARCLib.StringThinkPhase = 5
-			end
-		end
-		local per = (ARCLib.StringThink_i/ARCLib.LoadPerBase - 1)*-1
-		ARCLib.StringThink_callback(0.5 + per*0.5,"Loading... ("..math.floor(50 + per * 50).."%)")
-	elseif ARCLib.StringThinkPhase == 5 then
-		--MsgN("ARCLib.StringThinkPhase 5")
-		while table.HasValue(ARCLib.StringThink_fittedstrings,"") do -- Some checks to make sure everything is right
-			table.RemoveByValue(ARCLib.StringThink_fittedstrings,"")
-		end
-		while table.HasValue(ARCLib.StringThink_fittedstrings," ") do
-			table.RemoveByValue(ARCLib.StringThink_fittedstrings," ")
-		end
-		ARCLib.StringThink_callback(1,ARCLib.StringThink_fittedstrings)
-		ARCLib.StringThinkPhase = 0
-		ARCLib.StringThink_Strings = {}
-		ARCLib.StringThink_i = 1
-		ARCLib.StringThink_fittedstrings = {}
-		ARCLib.StringThink_callback = nil
-		ARCLib.StringThink_Percent = 0
-		ARCLib.StringThink_tempstring = ""
-		ARCLib.StringThink_length = 0
 	end
 end)
 
