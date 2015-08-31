@@ -192,8 +192,8 @@ function ARCLib.FitText(text,font,length,incoroutine)
 	local spacelen = surface.GetTextSize( " " )
 	for k,v in utf8.codes(text) do
 		if (v == " ") then
-			MsgN("curplace = "..curplace)
-			PrintTable(resulttab)
+			--MsgN("curplace = "..curplace)
+			--PrintTable(resulttab)
 			currentlinesize = surface.GetTextSize( resulttab[curplace] )
 			currentwordsize = surface.GetTextSize( currentword )
 			if (currentwordsize > length) then -- WORD IS LONGER THAN THE LENGTH OF THE SCREEN AAAAAAAAAAAAAAAAH
