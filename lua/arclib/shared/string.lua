@@ -99,6 +99,17 @@ function ARCLib.SplitString(str,num) -- Splits a string at every num characters
 	return result
 end
 
+
+function ARCLib.JamesHash(str)
+	local hash = 1
+	for i=1, #str do
+		hash = (2 * hash) + string.byte(str, i)
+		hash = hash % 2147483647
+	end
+	return tostring(hash)
+end
+
+
 if !CLIENT then return end -- The following code only functions on the client side since only the client has those surface.* functions
 
 if timer.Exists( "ARCLib_DumpCachedStrings" ) then
