@@ -1,19 +1,21 @@
 -- String stuffs
 
+local langtab = {}
+langtab.nd = "and"
+langtab.second = "second"
+langtab.seconds = "seconds"
+langtab.minute = "minute"
+langtab.minutes = "minutes"
+langtab.hour = "hour"
+langtab.hours = "hours"
+langtab.day = "day"
+langtab.days = "days"
+langtab.forever = "forever"
+langtab.now = "now"
+
 function ARCLib.TimeString(sec,tab) -- Converts seconds to a human-readable form. Also, string.NiceTime is terrible.
-	if(!tab || tab == {}) then -- I don't really like this, but it's for the sake of making it translatable!
-		tab = {}
-		tab.nd = "and"
-		tab.second = "second"
-		tab.seconds = "seconds"
-		tab.minute = "minute"
-		tab.minutes = "minutes"
-		tab.hour = "hour"
-		tab.hours = "hours"
-		tab.day = "day"
-		tab.days = "days"
-		tab.forever = "forever"
-		tab.now = "now"
+	if(!istable(tab) || #tab == 0 )then -- I don't really like this, but it's for the sake of making it translatable!
+		tab = langtab
 	end
 	if !sec || !isnumber(sec) || sec == math.huge then
 		return tab.forever
