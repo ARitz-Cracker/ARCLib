@@ -47,7 +47,6 @@ function ARCLib.GetNearestPlayer(pos,plyex) -- Gets the nearest player relative 
 	local dist = math.huge
 	local ply = NULL
 	assert(isvector(pos),"ARCLib.GetNearestPlayer: Bad argument #1. I wanted a vector, but I got a goddamn "..type(pos))
-	assert(istable(plyex) || ARCLib.IsPlayer(plyex),"ARCLib.GetNearestPlayer: Bad argument #2. I wanted a player or a table, but I got a goddamn "..type(plyex))
 	for _, v in pairs( player.GetAll() ) do
 		local newdist = pos:DistToSqr( v:GetPos() )
 		if istable(plyex) then
