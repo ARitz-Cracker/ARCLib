@@ -16,3 +16,12 @@ ARCLib.FlatIcons64 = {} -- Some of my addons use falticons! :D
 for k, v in pairs(file.Find( "materials/arc_flaticons/*.vmt", "GAME" )) do
 	ARCLib.FlatIcons64[string.Replace(v,".vmt","")] = surface.GetTextureID("arc_flaticons/"..string.Replace(v,".vmt",""))
 end
+
+-- Returns a material based on a file in the /data folder. TODO: Is the typ paramitar required?
+function ARCLib.MaterialFromTxt(mat,typ,param)
+	typ = string.lower(typ)
+	assert(typ == "png" || typ == "jpg","ARCLib.MaterialFromTxt: Second argument is not \"png\" or \"jpg\"")
+	local ret = Material("../data/" .. mat .. "\n."..typ, param)
+	LocalPlayer():ConCommand("mat_reloadmaterial ../data/" .. mat .. "*")
+	return ret
+end

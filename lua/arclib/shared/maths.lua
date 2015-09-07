@@ -51,14 +51,6 @@ function ARCLib.FloorDec(num,decimal) -- Floors a number nearest to the specifie
 	return math.floor(num*(10^decimal))/(10^decimal)
 end
 
-function ARCLib.DigiNumber(num,zeros) -- Puts zeros in front of a number. Useful for "retro" displays
-	if num == 0 then
-		return string.rep( "0", zeros ).."0"
-	end
-	return string.rep( "0", zeros-math.floor(math.log10(num)) )..tostring(math.floor(num))
-end
-
-
 function ARCLib.RandomRound(number) -- Randomly rounds things.
 	if tobool(math.Round(math.random())) then
 		return math.Round(number)

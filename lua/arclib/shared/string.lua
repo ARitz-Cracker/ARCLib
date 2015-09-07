@@ -101,6 +101,12 @@ function ARCLib.SplitString(str,num) -- Splits a string at every num characters
 	return result
 end
 
+function ARCLib.DigiNumber(num,zeros) -- Puts zeros in front of a number. Useful for "retro" displays
+	if num == 0 then
+		return string.rep( "0", zeros ).."0"
+	end
+	return string.rep( "0", zeros-math.floor(math.log10(num)) )..tostring(math.floor(num))
+end
 
 function ARCLib.JamesHash(str)
 	local hash = 1
@@ -108,8 +114,12 @@ function ARCLib.JamesHash(str)
 		hash = (2 * hash) + string.byte(str, i)
 		hash = hash % 2147483647
 	end
-	return tostring(hash)
+	
+	return ARCLib.DigiNumber(hash,9)
 end
+
+
+
 
 
 if !CLIENT then return end -- The following code only functions on the client side since only the client has those surface.* functions
