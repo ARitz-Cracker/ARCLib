@@ -82,6 +82,25 @@ function ARCLib.AddDir(dir) -- recursively adds everything in a directory to be 
 	end
 end
 
+function ARCLib.TableToSequential(tab)
+	local result = {}
+	local i = 0
+	for k,v in pairs(tab) do
+		i = i + 1
+		result[i] = v
+	end
+	return result
+end
+
+function ARCLib.RGBToCMY(col)
+	return {c = (1 - col.r / 255)*255,m = (1 - col.g / 255)*255,y = (1 - col.b / 255)*255,a = col.a}
+end
+
+function ARCLib.ColorNegative(col)
+	local tab = ARCLib.RGBToCMY(col)
+	return Color(tab.c,tab.m,tab.y,tab.a)
+end
+
 if CLIENT then
 	net.Receive( "ARCLib_Notify", function(length)
 		local msg = net.ReadString() 

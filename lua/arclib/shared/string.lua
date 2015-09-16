@@ -119,8 +119,17 @@ function ARCLib.JamesHash(str)
 end
 
 
+--I don't wanna use codepoints! :(
 
 
+function ARCLib.UTF8_Split(str)
+	local tab = {}
+	
+	for k,v in utf8.codes( str ) do
+		tab[#tab] = utf8.char
+	end
+	return tab
+end
 
 if !CLIENT then return end -- The following code only functions on the client side since only the client has those surface.* functions
 
@@ -128,17 +137,19 @@ if timer.Exists( "ARCLib_DumpCachedStrings" ) then
 	timer.Destroy( "ARCLib_DumpCachedStrings" )
 end
 timer.Create( "ARCLib_DumpCachedStrings", 300, 0, function() 
-	ARCLib.CachedStrings = {}
-	ARCLib.CachedStringsCut = {}
+	table.Empty(ARCLib.CachedStrings)
+	table.Empty(ARCLib.CachedStringsCut)
+	table.Empty(ARCLib.CachedStringsCutRev)
 end )
 ARCLib.CachedStrings = {}
 ARCLib.CachedStringsCut = {}
+ARCLib.CachedStringsCutRev = {}
 
-
-function ARCLib.CutOutText(text,font,length) -- Makes the trailing "..." if the text is too wide
+function ARCLib.CutOutTextReverse(text,font,length) -- Makes the trailing "..." if the text is too wide
 	if !isstring(text) then return type(text) end
-	if ARCLib.CachedStringsCut[util.CRC(text..font..length)] then -- I wonder if this will actually save performance...
-		return ARCLib.CachedStringsCut[util.CRC(text..font..length)]
+	local hash = util.CRC(text..font..length)
+	if ARCLib.CachedStringsCutRev[hash] then -- I wonder if this will actually save performance...
+		return ARCLib.CachedStringsCutRev[hash]
 	end
 	surface.SetFont( font )
 	local dotslen, _ = surface.GetTextSize("...")
@@ -149,15 +160,48 @@ function ARCLib.CutOutText(text,font,length) -- Makes the trailing "..." if the 
 	if txtlen <= length then
 		return text
 	end
-	local charplace = 0
-	local result = ""
-	local curlen,_ = surface.GetTextSize(result)
-	while curlen + dotslen < length do
-		charplace = charplace + 1
-		result = result..text[charplace]
-		curlen,_ = surface.GetTextSize(result)
+	local word = ""
+	local tab = ARCLib.UTF8_Split(text)
+	local i = #i
+	while i > 0 do
+		txtlen,_ = surface.GetTextSize("..."..tab[i]..word)
+		if (txtlen > length) then
+			break
+		else
+			word = tab[i] .. word
+		end
 	end
-	return string.Left( result, #result-1 ).."..."
+	ARCLib.CachedStringsCutRev[hash] = "..."..word
+	return ARCLib.CachedStringsCutRev[hash]
+end
+
+function ARCLib.CutOutText(text,font,length) -- Makes the trailing "..." if the text is too wide
+	if !isstring(text) then return type(text) end
+	local hash = util.CRC(text..font..length)
+	if ARCLib.CachedStringsCut[hash] then -- I wonder if this will actually save performance...
+		return ARCLib.CachedStringsCut[hash]
+	end
+	surface.SetFont( font )
+	local dotslen, _ = surface.GetTextSize("...")
+	if dotslen > length then
+		return "."
+	end
+	local txtlen,_ = surface.GetTextSize(text)
+	if txtlen <= length then
+		return text
+	end
+	local word = ""
+	for k,v in utf8.codes( text ) do
+		v = utf8.char(v)
+		txtlen,_ = surface.GetTextSize(word..v.."...")
+		if (txtlen > length) then
+			break
+		else
+			word = word .. v
+		end
+	end
+	ARCLib.CachedStringsCut[hash] = word.."..."
+	return ARCLib.CachedStringsCut[hash]
 end
 
 -- The following 2 functions do the same thing, they are mostly used by my 3D2D displays when I want to fit something in a box. One tries to do it all within the same frame, the other one does it in chunks so the game doesn't freeze.
@@ -213,7 +257,8 @@ function ARCLib.FitText(text,font,length,incoroutine)
 	local currentlinesize = 0
 	surface.SetFont( font )
 	local spacelen = surface.GetTextSize( " " )
-	for k,v in utf8.codes(text) do
+	for k,v in utf8.codes( text ) do
+		v = utf8.char(v)
 		if (v == " ") then
 			--MsgN("curplace = "..curplace)
 			--PrintTable(resulttab)
