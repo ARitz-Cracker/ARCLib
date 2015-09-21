@@ -124,9 +124,10 @@ end
 
 function ARCLib.UTF8_Split(str)
 	local tab = {}
-	
+	local i = 0
 	for k,v in utf8.codes( str ) do
-		tab[#tab] = utf8.char
+		i = i + 1
+		tab[i] = utf8.char(v)
 	end
 	return tab
 end
@@ -162,13 +163,14 @@ function ARCLib.CutOutTextReverse(text,font,length) -- Makes the trailing "..." 
 	end
 	local word = ""
 	local tab = ARCLib.UTF8_Split(text)
-	local i = #i
+	local i = #tab
 	while i > 0 do
 		txtlen,_ = surface.GetTextSize("..."..tab[i]..word)
 		if (txtlen > length) then
 			break
 		else
 			word = tab[i] .. word
+			i = i - 1
 		end
 	end
 	ARCLib.CachedStringsCutRev[hash] = "..."..word

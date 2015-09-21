@@ -139,3 +139,8 @@ function ARCLib.BoolToNumber(bool) -- Turns a boolean into a 0 or 1. Useful for 
 		return 0
 	end
 end
+
+--Distance between a line passing through points 1 and 2 from point 0
+function ARCLib.PointDistToLine(x1,y1,x2,y2,x0,y0)
+	return math.abs((y2-y1)*x0 - (x2-x1)*y0 + x2*y1 - y2*x1) / math.sqrt((y2-y1)^2 + (x2-x1)^2)
+end

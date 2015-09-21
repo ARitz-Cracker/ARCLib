@@ -30,6 +30,8 @@ function table.FullCopy( tab )
 			res[k] = table.FullCopy(v) // recursion ho!
 		elseif (type(v) == "Vector") then
 			res[k] = Vector(v.x, v.y, v.z)
+		elseif (type(v) == "Color") then
+			res[k] = Color(v.r, v.g, v.b, v.a)
 		elseif (type(v) == "Angle") then
 			res[k] = Angle(v.p, v.y, v.r)
 		else
