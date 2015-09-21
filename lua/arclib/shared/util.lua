@@ -169,6 +169,13 @@ function ARCLib.UnJSONSafe( t, done )
 	return tbl
 end
 
+function ARCLib.ValidVariable(var,checker,default)
+	if checker then
+		return var
+	else
+		return default
+	end
+end
 
 if CLIENT then
 	net.Receive( "ARCLib_Notify", function(length)
