@@ -1,4 +1,13 @@
 
+function ARCLib.RandomExclude(min,max,...)
+	local result
+	local num = {...}
+	repeat
+		result = math.random(min,max)
+	until !table.HasValue(num,result)
+	return result
+end
+
 function ARCLib.DistanceLinePoints(x0,y0,x1,y1,x2,y2)
 	-- https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
 	return math.abs((y2-y1)*x0 - (x2-x1)*y0 + x2*y1 - y2*x1)/math.sqrt((y2-y1)^2 + (x2-x1)^2)
