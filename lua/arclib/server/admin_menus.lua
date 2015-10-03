@@ -20,7 +20,7 @@ function ARCLib.UpdateAddonSetting(addon,setting,ply)
 	if _G[addon] && _G[addon].Settings && _G[addon].Settings[setting] then
 		local typ = TypeID(_G[addon].Settings[setting])
 		net.Start("arclib_comm_client_settings_changed")
-		net.WriteString("addon")
+		net.WriteString(addon)
 		net.WriteUInt(typ,16)
 		net.WriteString(setting)
 		if typ == TYPE_NUMBER then
