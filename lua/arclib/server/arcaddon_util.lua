@@ -61,7 +61,7 @@ end
 
 util.AddNetworkString( "arclib_comm_lang" )
 function ARCLib.SendAddonLanguage(addon,v)
-	if !v["_"..addon.."_Lang_Place"] then
+	if istable(_G[addon].JSON_Lang) && !v["_"..addon.."_Lang_Place"] then
 		net.Start("arclib_comm_lang")
 		net.WriteInt(0,ARCBANK_ERRORBITRATE)
 		v["_"..addon.."_Lang_Place"] = 0
