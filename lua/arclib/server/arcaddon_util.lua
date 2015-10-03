@@ -58,9 +58,11 @@ function ARCLib.SetAddonLanguage(addon)
 	end
 end
 
+
+util.AddNetworkString( "arclib_comm_lang" )
 function ARCLib.SendAddonLanguage(addon,v)
 	if !v["_"..addon.."_Lang_Place"] then
-		net.Start("arcbank_comm_lang")
+		net.Start("arclib_comm_lang")
 		net.WriteInt(0,ARCBANK_ERRORBITRATE)
 		v["_"..addon.."_Lang_Place"] = 0
 		net.WriteUInt(0,32)
@@ -70,7 +72,7 @@ function ARCLib.SendAddonLanguage(addon,v)
 	end
 end
 
-util.AddNetworkString( "arclib_comm_lang" )
+
 net.Receive( "arclib_comm_lang", function(length,ply)
 	local addon = net.ReadString()
 	local part = net.ReadUInt(32)
