@@ -77,12 +77,12 @@ net.Receive( "arclib_comm_lang", function(length,ply)
 	local whole  = net.ReadUInt(32)
 	if whole == #_G[addon].JSON_Lang then
 		if part == ply["_"..addon.."_Lang_Place"] then
-			ply.["_"..addon.."_Lang_Place"] = ply.["_"..addon.."_Lang_Place"] + 1
+			ply["_"..addon.."_Lang_Place"] = ply["_"..addon.."_Lang_Place"] + 1
 			net.Start("arclib_comm_lang")
 			net.WriteInt(0,8)
-			net.WriteUInt(ply.["_"..addon.."_Lang_Place"],32)
+			net.WriteUInt(ply["_"..addon.."_Lang_Place"],32)
 			net.WriteUInt(#_G[addon].JSON_Lang,32)
-			local str = tostring(_G[addon].JSON_Lang[ply.["_"..addon.."_Lang_Place"]])
+			local str = tostring(_G[addon].JSON_Lang[ply["_"..addon.."_Lang_Place"]])
 			net.WriteUInt(#str,32)
 			net.WriteData(str,#str)
 			net.Send(ply)
@@ -92,7 +92,7 @@ net.Receive( "arclib_comm_lang", function(length,ply)
 			net.Send(ply)
 		end
 	elseif part == 0 && whole == 0 then
-		ply.["_"..addon.."_Lang_Place"] = nil
+		ply["_"..addon.."_Lang_Place"] = nil
 	else
 		net.Start("arclib_comm_lang")
 		net.WriteInt(2,0)
