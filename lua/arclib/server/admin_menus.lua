@@ -10,6 +10,7 @@ function ARCLib.SendAddonSettings(addon,ply)
 		net.Start("arclib_comm_client_settings")
 		net.WriteString(addon)
 		net.WriteUInt(#data,32)
+		net.WriteData(data,#data)
 		net.Send(ply)
 	end
 end
