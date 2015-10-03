@@ -5,10 +5,10 @@ net.Receive( "arclib_comm_client_settings", function(length)
 	local len = net.ReadUInt(32)
 	if _G[addon] && _G[addon].Settings then
 		_G[addon].Settings = util.JSONToTable(util.Decompress(net.ReadData(len)))
-	end
-	if _G[addon].OnSettingChanged then
-		for k,v in pairs(_G[addon].Settings) do
-			_G[addon].OnSettingChanged(k,v)
+		if _G[addon].OnSettingChanged then
+			for k,v in pairs(_G[addon].Settings) do
+				_G[addon].OnSettingChanged(k,v)
+			end
 		end
 	end
 end)
