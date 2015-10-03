@@ -93,7 +93,7 @@ function ARCLib.AddSettingConsoleCommands(addon)
 		adminonly = true,
 		hidden = false
 	}
-	_G[addon].Commands["settings"] = {
+	_G[addon].Commands["settings_help"] = {
 		command = function(ply,args) 
 			if !_G[addon].Loaded then _G[addon].MsgCL(ply,_G[addon].Msgs.CommandOutput.SysReset) return end
 			if !args[1] then 
