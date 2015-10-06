@@ -64,7 +64,7 @@ function ARCLib.AddonConfigMenu(addon,cmd)
 	end
 
 	local SettingSave = vgui.Create( "DButton", SettingsContainer )
-	SettingSave:SetText( "Save settings" )
+	SettingSave:SetText( _G[addon].Msgs.AdminMenu.SaveSettings )
 	SettingSave:SetPos( 10, 152 )
 	SettingSave:SetSize( 265, 20 )
 	SettingSave.DoClick = function()

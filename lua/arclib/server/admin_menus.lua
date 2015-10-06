@@ -200,3 +200,21 @@ function ARCLib.AddonLoadSettings(addon,backward)
 		_G[addon].Msg("No settings file found! Using defaults.")
 	end
 end
+
+function ARCLib.AddonLoadSpecialSettings(addon)
+	if file.Exists(_G[addon].Dir.."/_saved_special_settings.txt","DATA") then
+		local disksettings = util.JSONToTable(file.Read(_G[addon].Dir.."/_saved_special_settings.txt","DATA"))
+		
+		if disksettings then
+			ARCLib.RecursiveTableMerge(_G[addon].SpecialSettings,disksettings)
+			_G[addon].Msg("Special settings successfully set.")
+		else
+			_G[addon].Msg("Special settings file is corrupt or something! Using defaults.")
+		end
+	else
+		_G[addon].Msg("No special settings file found! Using defaults.")
+	end
+end
+function ARCLib.AddonSaveSpecialSettings(addon)
+	file.Write(_G[addon].Dir.."/_saved_special_settings.txt",util.TableToJSON(_G[addon].SpecialSetting))
+end

@@ -26,13 +26,13 @@ net.Receive( "arclib_comm_lang", function(length)
 				end
 				UpdateLang_Chunks[addon] = ""
 				UpdateLang_Progress[addon] = 0
-				net.Start("arcbank_comm_lang")
+				net.Start("arclib_comm_lang")
 				net.WriteString(addon)
 				net.WriteUInt(0,32)
 				net.WriteUInt(0,32)
 				net.SendToServer()
 			else
-				net.Start("arcbank_comm_lang")
+				net.Start("arclib_comm_lang")
 				net.WriteString(addon)
 				net.WriteUInt(part,32)
 				net.WriteUInt(whole,32)

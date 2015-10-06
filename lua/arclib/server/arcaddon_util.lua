@@ -63,7 +63,8 @@ util.AddNetworkString( "arclib_comm_lang" )
 function ARCLib.SendAddonLanguage(addon,v)
 	if istable(_G[addon].JSON_Lang) && !v["_"..addon.."_Lang_Place"] then
 		net.Start("arclib_comm_lang")
-		net.WriteInt(0,ARCBANK_ERRORBITRATE)
+		net.WriteString(addon)
+		net.WriteInt(0,8)
 		v["_"..addon.."_Lang_Place"] = 0
 		net.WriteUInt(0,32)
 		net.WriteUInt(#_G[addon].JSON_Lang,32)
@@ -81,6 +82,7 @@ net.Receive( "arclib_comm_lang", function(length,ply)
 		if part == ply["_"..addon.."_Lang_Place"] then
 			ply["_"..addon.."_Lang_Place"] = ply["_"..addon.."_Lang_Place"] + 1
 			net.Start("arclib_comm_lang")
+			net.WriteString(addon)
 			net.WriteInt(0,8)
 			net.WriteUInt(ply["_"..addon.."_Lang_Place"],32)
 			net.WriteUInt(#_G[addon].JSON_Lang,32)
@@ -90,14 +92,16 @@ net.Receive( "arclib_comm_lang", function(length,ply)
 			net.Send(ply)
 		else
 			net.Start("arclib_comm_lang")
-			net.WriteInt(1,0)
+			net.WriteString(addon)
+			net.WriteInt(1,8)
 			net.Send(ply)
 		end
 	elseif part == 0 && whole == 0 then
 		ply["_"..addon.."_Lang_Place"] = nil
 	else
 		net.Start("arclib_comm_lang")
-		net.WriteInt(2,0)
+		net.WriteString(addon)
+		net.WriteInt(2,8)
 		net.Send(ply)
 	end
 end)
