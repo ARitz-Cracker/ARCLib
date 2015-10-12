@@ -22,9 +22,9 @@ function ARCLib.AddAddonConcommand(addon,command)
 			end
 			_G[addon].Commands[comm].command(ply,args)
 		elseif !comm then
-			_G[addon].MsgCL(ply,"No command. Type '"..addon.." help' for help.")
+			_G[addon].MsgCL(ply,"No command. Type '"..command.." help' for help.")
 		else
-			_G[addon].MsgCL(ply,"Invalid command '"..tostring(comm).."' Type '"..addon.." help' for help.")
+			_G[addon].MsgCL(ply,"Invalid command '"..tostring(comm).."' Type '"..command.." help' for help.")
 		end
 	end)
 end

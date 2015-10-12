@@ -132,6 +132,21 @@ function ARCLib.UTF8_Split(str)
 	return tab
 end
 
+function ARCLib.PlaceholderReplace(str,placeholders)
+	local tab
+	tab = {string.gmatch(str, "(%%([^%%]*)%%)")()}
+	while tab[1] do
+		for k,v in pairs(placeholders) do
+			if tab[2] == k then
+				str = string.Replace( str, tab[1], v ) 
+				break
+			end
+		end
+		tab = {string.gmatch(str, "(%%([^%%]*)%%)")()}
+	end
+	return str
+end
+
 if !CLIENT then return end -- The following code only functions on the client side since only the client has those surface.* functions
 
 if timer.Exists( "ARCLib_DumpCachedStrings" ) then

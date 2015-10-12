@@ -1,4 +1,5 @@
 ARCLib = ARCLib or {}
-ARCLib.Version = 1.5
+ARCLib.Version = %%VERSION%%
 ARCLib.Update = "%%UPDATE%%"
 MsgN("ARCLib v"..ARCLib.Version)
+MsgN("ARCLib update "..ARCLib.Update)
