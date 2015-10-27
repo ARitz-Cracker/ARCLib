@@ -187,12 +187,10 @@ function ARCLib.AddonConfigMenu(addon,cmd)
 			SettingStr:SetVisible(true)
 			SettingsTabContainer:SetVisible(false)
 			SettingStr:SetValue( settings[value] )
-			SettingStr.OnValueChanged = function( pan, val )
-				SettingStr:SetValue(tostring(val))
+			SettingStr.OnValueChange = function( pan, val )
 				RunConsoleCommand( cmd,"settings",value,tostring(val))
 			end
 			SettingStr.OnEnter = function()
-				SettingStr:SetValue(SettingStr:GetValue())
 				RunConsoleCommand( cmd, "settings",value,SettingStr:GetValue())
 			end
 		elseif isbool(settings[value]) then
