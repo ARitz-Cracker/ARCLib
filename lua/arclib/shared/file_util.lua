@@ -7,7 +7,7 @@ end
 
 
 function ARCLib.DeleteAll(dir) --Exactly like doing "rm -rf [dir]" on linux
-	if file.IsDir(dir) then
+	if file.IsDir(dir,"DATA") then
 		local files, directories = file.Find( dir.."/*", "DATA" )
 		for k,v in pairs(files) do
 			file.Delete(dir.."/"..v)

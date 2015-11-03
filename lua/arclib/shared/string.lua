@@ -221,6 +221,46 @@ function ARCLib.CutOutText(text,font,length) -- Makes the trailing "..." if the 
 	return ARCLib.CachedStringsCut[hash]
 end
 
+--[[
+local str = "Hello, world!" 
+for i=-#str,#str do 
+	MsgN(ARCLib.ScrollChars(str,i,3)) 
+end
+
+]]
+
+function ARCLib.ScrollChars(str,place,len)
+	local chars = {}
+	local charslen = 0
+	if place < 1 then
+		place = -place + 1
+		for i=1,place do
+			charslen = charslen + 1
+			chars[charslen] = 32
+			len = len - 1
+			if len == 0 then
+				break
+			end
+		end
+		place = 1
+	end
+	if len > 0 then
+		local i = 1
+		for k,v in utf8.codes( str ) do
+			if i >= place then
+				charslen = charslen + 1
+				chars[charslen] = v
+				len = len - 1
+				if len == 0 then
+					break
+				end
+			end
+			i = i + 1
+		end
+	end
+	return utf8.char(unpack(chars))..string.rep( " ", len) 
+end
+
 -- The following 2 functions do the same thing, they are mostly used by my 3D2D displays when I want to fit something in a box. One tries to do it all within the same frame, the other one does it in chunks so the game doesn't freeze.
 
 

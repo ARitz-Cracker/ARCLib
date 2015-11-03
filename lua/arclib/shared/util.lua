@@ -299,7 +299,7 @@ else
 			net.WriteUInt(lvl,8)
 			net.WriteUInt(ptch,8)
 			net.SendToServer()
-			MsgN(soundspam)
+			--MsgN(soundspam)
 		end
 		soundspam = soundspam + 1
 	end
