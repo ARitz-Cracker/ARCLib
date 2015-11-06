@@ -6,6 +6,10 @@ net.Receive( "arclib_comm_lang", function(length)
 	if !UpdateLang_Chunks[addon] then UpdateLang_Chunks[addon] = "" end
 	local succ = net.ReadInt(ARCBANK_ERRORBITRATE)
 	local part = net.ReadUInt(32)
+	if part == 0 then
+		UpdateLang_Progress[addon] = 0
+		UpdateLang_Chunks[addon] = ""
+	end
 	local whole = net.ReadUInt(32)
 	local chunklen = net.ReadUInt(32)
 	local str = ""
