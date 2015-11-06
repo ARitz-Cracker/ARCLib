@@ -2,7 +2,7 @@ ARCLib = ARCLib or {}
 local ver = 1.5
 if !ARCLib.Version || ARCLib.Version < ver then
 	ARCLib.Version = ver
-	ARCLib.Update = "August 26th 2015"
+	ARCLib.Update = "November 3rd 2015"
 	MsgN("ARCLib v"..ARCLib.Version)
 	if SERVER then
 		AddCSLuaFile()

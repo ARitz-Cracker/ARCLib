@@ -24,11 +24,11 @@ function ARCLib.UpdateAddonSetting(addon,setting,ply)
 		net.WriteUInt(typ,16)
 		net.WriteString(setting)
 		if typ == TYPE_NUMBER then
-			val = net.WriteDouble(_G[addon].Settings[setting])
+			net.WriteDouble(_G[addon].Settings[setting])
 		elseif typ == TYPE_STRING then
-			val = net.WriteString(_G[addon].Settings[setting])
+			net.WriteString(_G[addon].Settings[setting])
 		elseif typ == TYPE_BOOL then
-			val = net.WriteBit(_G[addon].Settings[setting])
+			net.WriteBit(_G[addon].Settings[setting])
 		elseif typ == TYPE_TABLE then
 			net.WriteTable(_G[addon].Settings[setting])
 		else

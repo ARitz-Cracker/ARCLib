@@ -25,7 +25,7 @@ net.Receive( "arclib_comm_client_settings_changed", function(length)
 	elseif typ == TYPE_BOOL then
 		val = tobool(net.ReadBit())
 	elseif typ == TYPE_TABLE then
-		net.ReadTable()
+		val = net.ReadTable()
 	else
 		error("Server attempted to send unknown setting type. (wat)")
 	end
