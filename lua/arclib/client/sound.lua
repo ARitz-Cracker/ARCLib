@@ -1,5 +1,6 @@
 --sounds
-file.CreateDir("arclib_soundcache")
+file.CreateDir("arclib_cache")
+file.CreateDir("arclib_cache/sound")
 function ARCLib.PlayCachedURL(url,flags,callback)
 	local path
 	for i=1,#url do
@@ -9,7 +10,7 @@ function ARCLib.PlayCachedURL(url,flags,callback)
 			break;
 		end
 	end
-	path[1] = "arclib_soundcache/"..path[1]
+	path[1] = "arclib_cache/sound/"..path[1]
 	for i=2,#path do
 		path[i] = path[i-1].."/"..path[i]
 	end
@@ -38,5 +39,5 @@ function ARCLib.PlayCachedURL(url,flags,callback)
 end
 
 hook.Add( "ShutDown", "ARCLib CachedSounds", function()
-	ARCLib.DeleteAll("arclib_soundcache")
+	ARCLib.DeleteAll("arclib_cache/sound")
 end)
