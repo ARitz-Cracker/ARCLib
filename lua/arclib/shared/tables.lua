@@ -1,6 +1,23 @@
 -- Table stuffs
 
 
+local CachedTables = {}
+if timer.Exists( "ARCLib_DumpCachedTables" ) then
+	timer.Destroy( "ARCLib_DumpCachedTables" )
+end
+timer.Create( "ARCLib_DumpCachedStrings", 30, 0, function() 
+	table.Empty(CachedTables)
+end)
+function ARCLib.TableHasValueCached(tab,val)
+	if (!CachedTables[tab]) then
+		CachedTables[tab] = {}
+		for k,v in pairs(tab) do
+			CachedTables[tab][v] = true
+		end	
+	end
+	return CachedTables[tab][val] == true
+end
+
 function ARCLib.TableMergeOptimized( dest, source ) -- Slightly more optimized version of table.Marge (except it makes both tables equal to each other...)
 	for k, v in pairs( dest ) do
 		if source[k] == nil then
@@ -8,6 +25,7 @@ function ARCLib.TableMergeOptimized( dest, source ) -- Slightly more optimized v
 		end
 	end
 	dest = source
+	
 	return dest
 end
 
