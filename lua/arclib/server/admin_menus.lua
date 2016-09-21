@@ -180,7 +180,7 @@ function ARCLib.AddonLoadSettings(addon,backward)
 		if disksettings then
 			for k,v in pairs(_G[addon].Settings) do
 				if disksettings[k] == nil then
-					_G[addon].Msg(""..k.." not found in disk settings. Possibly out of date. Using default.")				
+					_G[addon].Msg(""..k.." not found in disk settings, possibly out of date. Using default value.")
 				else
 					_G[addon].Settings[k] = disksettings[k]
 				end
@@ -188,6 +188,7 @@ function ARCLib.AddonLoadSettings(addon,backward)
 			if istable(backward) then
 				for k,v in pairs(backward) do
 					if disksettings[k] then
+						_G[addon].Msg(""..k.." setting has been renamed to "..v..". Please re-save the config file to apply these changes.")
 						_G[addon].Settings[v] = disksettings[k]
 					end
 				end
