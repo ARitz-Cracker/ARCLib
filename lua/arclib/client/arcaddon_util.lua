@@ -4,7 +4,7 @@ net.Receive( "arclib_comm_lang", function(length)
 	local addon = net.ReadString()
 	if !UpdateLang_Progress[addon] then UpdateLang_Progress[addon] = 0 end
 	if !UpdateLang_Chunks[addon] then UpdateLang_Chunks[addon] = "" end
-	local succ = net.ReadInt(ARCBANK_ERRORBITRATE)
+	local succ = net.ReadInt(8)
 	local part = net.ReadUInt(32)
 	if part == 0 then
 		UpdateLang_Progress[addon] = 0
