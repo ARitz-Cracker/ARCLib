@@ -3,7 +3,7 @@
 function ARCLib.RandomString(len,arr)
 	local str = ""
 	for i=1,len do
-		str = str + arr[math.random(1,#arr)]
+		str = str .. arr[math.random(1,#arr)]
 	end
 	return str
 end
