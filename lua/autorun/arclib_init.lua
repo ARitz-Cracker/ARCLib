@@ -1,5 +1,5 @@
 ARCLib = ARCLib or {}
-local ver = 1.5
+local ver = 1.6
 if !ARCLib.Version || ARCLib.Version < ver then
 	ARCLib.Version = ver
 	ARCLib.Update = "November 3rd 2015"
@@ -30,3 +30,4 @@ if !ARCLib.Version || ARCLib.Version < ver then
 		end
 	end
 end
+
