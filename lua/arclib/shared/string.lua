@@ -8,6 +8,14 @@ function ARCLib.RandomString(len,arr)
 	return str
 end
 
+function ARCLib.RandomChars(len)
+	local result = {}
+	for i=1,len do
+		result[i] = math.random(32,127)
+	end
+	return string.char(unpack(result))
+end
+
 local langtab = {}
 langtab.nd = "and"
 langtab.second = "second"

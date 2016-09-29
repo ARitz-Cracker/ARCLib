@@ -3,17 +3,12 @@ function ARCLib.AddAddonConcommand(addon,command)
 		local comm = args[1]
 		table.remove( args, 1 )
 		if _G[addon].Commands[comm] then
-			if _G[addon].Commands[comm].adminonly && ply && ply:IsPlayer() && !ply:IsAdmin() && !ply:IsSuperAdmin() then
-				_G[addon].MsgCL(ply,_G[addon].Msgs.CommandOutput.admin)
-			return end
-			if _G[addon].Commands[comm].adminonly && _G[addon].Settings["superadmin_only"] && ply && ply:IsPlayer() && !ply:IsSuperAdmin() then
-				_G[addon].MsgCL(ply,_G[addon].Msgs.CommandOutput.superadmin)
-			return end
-			if _G[addon].Commands[comm].adminonly && _G[addon].Settings["owner_only"] && ply && ply:IsPlayer() && string.lower(ply:GetUserGroup()) != "owner" then
-				_G[addon].MsgCL(ply,_G[addon].Msgs.CommandOutput.superadmin)
+			
+			if _G[addon].Commands[comm].adminonly && IsValid(ply) && !table.HasValue(_G[addon].Settings.admins,string.lower(ply:GetUserGroup())) then
+				ARCLib.PlaceholderReplace(ARCBank.Msgs.CommandOutput.AdminCommand,{RANKS=table.concat( _G[addon].Settings.admins, ", " )})
 			return end
 			
-			if ply && ply:IsPlayer() then
+			if IsValid(ply) then
 				local shitstring = ply:Nick().." ("..ply:SteamID()..") used the command: "..comm
 				for i=1,#args do
 					shitstring = shitstring.." "..args[i]
