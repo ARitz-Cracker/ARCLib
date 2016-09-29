@@ -2,7 +2,7 @@ ARCLib = ARCLib or {}
 local ver = 1.5
 if !ARCLib.Version || ARCLib.Version < ver then
 	ARCLib.Version = ver
-	ARCLib.Update = "November 3rd 2015"
+	ARCLib.Update = "September 30th 2016"
 	MsgN("ARCLib v"..ARCLib.Version)
 	if SERVER then
 		AddCSLuaFile()
@@ -28,5 +28,10 @@ if !ARCLib.Version || ARCLib.Version < ver then
 		for i, v in pairs( clientfiles ) do
 			include( "arclib/client/"..v )
 		end
+	end
+	local arcloadfiles, _ = file.Find( "arclib_autorun/*.lua", "LUA" )
+	for i, v in pairs( arcloadfiles ) do
+		AddCSLuaFile( "arclib_autorun/"..v  )
+		MsgN("ARCLIBARCLIBARCLIBARCLIBARCLIBARCLIBARCLIB",include( "arclib_autorun/"..v ))
 	end
 end
