@@ -1,20 +1,11 @@
 ARCLib.Icons16 = {}
 for k, v in pairs(file.Find( "materials/icon16/*.png", "GAME" )) do
-	ARCLib.Icons16[string.Replace(v,".png","")] = Material ("icon16/"..v, "nocull")
-end
-ARCLib.Icons32 = {}
-for k, v in pairs(file.Find( "materials/icon32/*.png", "GAME" )) do
-	ARCLib.Icons32[string.Replace(v,".png","")] = Material ("icon32/"..v, "nocull")
-end
-
-ARCLib.Icons32t = {} -- Some of my addons have vmt versions of the 32x32 icons
-for k, v in pairs(file.Find( "materials/icon32_t/*.vmt", "GAME" )) do
-	ARCLib.Icons32t[string.Replace(v,".vmt","")] = surface.GetTextureID("icon32_t/"..string.Replace(v,".vmt",""))
+	ARCLib.Icons16[string.sub(v,1,-5)] = Material ("icon16/"..v, "nocull")
 end
 
 ARCLib.FlatIcons64 = {} -- Some of my addons use falticons! :D
 for k, v in pairs(file.Find( "materials/arc_flaticons/*.vmt", "GAME" )) do
-	ARCLib.FlatIcons64[string.Replace(v,".vmt","")] = surface.GetTextureID("arc_flaticons/"..string.Replace(v,".vmt",""))
+	ARCLib.FlatIcons64[string.sub(v,1,-5)] = surface.GetTextureID("arc_flaticons/"..string.Replace(v,".vmt",""))
 end
 
 -- Returns a material based on a file in the /data folder. TODO: Is the typ paramitar required?
@@ -101,14 +92,14 @@ function ARCLib.GetIcon(t,name)
 	elseif t == 4 then
 		tab = ARCLib._WebIcons32Gray
 	end
-	if (!tab) then return ARCLib.Icons16["emotocon_unhappy"] end
+	if (!tab || !name) then return ARCLib.Icons16["emotocon_unhappy"] end
 	if (tab[name]) then
 		return tab[name]
 	end
 	if ARCLib.Icons16[name] then
 		tab[name] = ARCLib.Icons16[name]
 	else
-		tab[name] = ARCLib.Icons16["new"]
+		tab[name] = ARCLib.Icons16["bullet_blue"]
 	end
 	local dirname = "arclib_cache/icons/"
 	local urlname = "https://update.aritzcracker.ca/fatcow_icons"
@@ -141,6 +132,5 @@ end
 function ARCLib.GetWebIcon32Gray(name)
 	return ARCLib.GetIcon(4,name)
 end
-
 
 

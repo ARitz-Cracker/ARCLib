@@ -66,6 +66,42 @@ function ARCLib.ValidVariable(var,checker,default)
 	end
 end
 
+function ARCLib.IsVersion(version,addon)
+	
+	
+	addon = addon or "ARCLib"
+	local currentversion = _G[addon].Version
+	if type(currentversion) != "string" then return false end
+	local vertab = {string.match(version,"([0-9]*).([0-9]*).([0-9]*)")}
+	local curvertab = {string.match(currentversion,"([0-9]*).([0-9]*).([0-9]*)")}
+	curvertab[1] = tonumber(curvertab[1])
+	curvertab[2] = tonumber(curvertab[2])
+	curvertab[3] = tonumber(curvertab[3])
+	vertab[1] = tonumber(vertab[1])
+	vertab[2] = tonumber(vertab[2])
+	vertab[3] = tonumber(vertab[3])
+	
+	if #curvertab != 3 then return false end
+	if #vertab != 3 then return false end
+	for i=1,3 do
+		if !vertab[i] || !curvertab[i] then return false end
+	end
+	if curvertab[1] > vertab[1] then
+		return true
+	end
+	if curvertab[1] == vertab[1] then
+		if curvertab[2] > vertab[2] then
+			return true
+		end
+		if curvertab[2] == vertab[2] then
+			if curvertab[3] >= vertab[3] then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 if CLIENT then
 	net.Receive( "ARCLib_Notify", function(length)
 		local msg = net.ReadString() 
@@ -75,7 +111,6 @@ if CLIENT then
 		notification.AddLegacy(msg,typ,time) 
 		if snd then
 			if typ == NOTIFY_ERROR then
-				 
 				LocalPlayer():EmitSound("buttons/button8.wav" )
 			else
 				LocalPlayer():EmitSound("ambient/water/drip"..math.random(1, 4)..".wav" )
