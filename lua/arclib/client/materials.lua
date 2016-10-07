@@ -80,16 +80,21 @@ local function GetIconFromInterwebs(tab,dirname,urlname,iconname,retries)
 		end
 	)
 end
+ARCLib.ICON_16 = 1
+ARCLib.ICON_32 = 2
+ARCLib.ICON_16_GRAY = 3
+ARCLib.ICON_32_GRAY = 4
+
 
 function ARCLib.GetIcon(t,name)
 	local tab 
-	if t == 1 then
+	if t == ARCLib.ICON_16 then
 		tab = ARCLib._WebIcons16
-	elseif t == 2 then
+	elseif t == ARCLib.ICON_32 then
 		tab = ARCLib._WebIcons32
-	elseif t == 3 then
+	elseif t == ARCLib.ICON_16_GRAY then
 		tab = ARCLib._WebIcons16Gray
-	elseif t == 4 then
+	elseif t == ARCLib.ICON_32_GRAY then
 		tab = ARCLib._WebIcons32Gray
 	end
 	if (!tab || !name) then return ARCLib.Icons16["emotocon_unhappy"] end
