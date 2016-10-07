@@ -1,5 +1,6 @@
 -- admin_menus.lua -- for addons that want to take advantage of the admin gui
 
+ARCLib.AddonsUsingSettings = {}
 
 util.AddNetworkString("arclib_comm_client_settings")
 
@@ -17,7 +18,7 @@ end
 
 util.AddNetworkString("arclib_comm_client_settings_changed")
 function ARCLib.UpdateAddonSetting(addon,setting,ply)
-	if _G[addon] && _G[addon].Settings && _G[addon].Settings[setting] then
+	if _G[addon] && _G[addon].Settings && _G[addon].Settings[setting] != nil then
 		local typ = TypeID(_G[addon].Settings[setting])
 		net.Start("arclib_comm_client_settings_changed")
 		net.WriteString(addon)
@@ -175,6 +176,7 @@ end
 
 
 function ARCLib.AddonLoadSettings(addon,backward)
+	ARCLib.AddonsUsingSettings[addon] = true
 	if file.Exists(_G[addon].Dir.."/_saved_settings.txt","DATA") then
 		local disksettings = util.JSONToTable(file.Read(_G[addon].Dir.."/_saved_settings.txt","DATA"))
 		if disksettings then
@@ -200,6 +202,7 @@ function ARCLib.AddonLoadSettings(addon,backward)
 	else
 		_G[addon].Msg("No settings file found! Using defaults.")
 	end
+	ARCLib.SendAddonSettings(addon,player.GetHumans())
 end
 
 function ARCLib.AddonLoadSpecialSettings(addon)

@@ -1,3 +1,6 @@
+
+ARCLib.AddonsUsingLanguages = {}
+
 function ARCLib.AddAddonConcommand(addon,command) 
 	concommand.Add( command, function( ply, cmd, args )
 		local comm = args[1]
@@ -25,6 +28,7 @@ function ARCLib.AddAddonConcommand(addon,command)
 end
 
 function ARCLib.SetAddonLanguage(addon)
+	ARCLib.AddonsUsingLanguages[addon] = true
 	local lang = _G[addon].Settings.language
 	local lanstr = file.Read(_G[addon].Dir.."/languages/"..lang..".txt","DATA")
 	if lanstr && lanstr != "" then

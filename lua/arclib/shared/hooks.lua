@@ -28,4 +28,13 @@ else
 			ply.ARCLib_FullyLoaded = true
 		end
 	end)
+	
+	hook.Add( "PlayerInitialSpawn", "ARCLib SendSettings", function(ply)
+		for k,v in pairs(ARCLib.AddonsUsingSettings) do
+			ARCLib.SendAddonSettings(k,ply)
+		end
+		for k,v in pairs(ARCLib.AddonsUsingLanguages) do
+			ARCLib.SendAddonLanguage(k,ply)
+		end
+	end)
 end
