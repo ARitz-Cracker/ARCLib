@@ -60,6 +60,7 @@ And call this function on the server to start the networking magic! This functio
 ```
 ARCLib.AddonLoadSettings("YourAddon",{old_setting_name = "new_setting_name"}) -- As you can see, this also supports the renaming of settings!
 ```
+Now at any moment, call ```ARCLib.AddonConfigMenu("YourAddon","theawesomeaddon")``` on the client.
 
 ## The auto-loader (With dependency managment!!!)
 I've created the auto loader for 2 reasons.
