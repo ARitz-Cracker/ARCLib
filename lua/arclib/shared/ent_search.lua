@@ -3,10 +3,6 @@
 function ARCLib.IsPlayer(ent)
 	return isentity(ent) && ent:IsPlayer()
 end
--- Used by some of my addons...
-function ARCLib.GetUserID(ply)
-	return ply._ARCFakeUserID or ply:SteamID()
-end
 
 function ARCLib.GetPlayerBySteamID(steamid) -- Gets a player by their SteamID
 	local ply = {}
@@ -18,24 +14,6 @@ function ARCLib.GetPlayerBySteamID(steamid) -- Gets a player by their SteamID
 	end
 	if !IsValid(ply) then
 		function ply:SteamID() return steamid end
-		function ply:Nick() return "[Player Offline]" end
-		function ply:IsPlayer() return false end
-		function ply:IsValid() return false end
-	end
-	return ply
-end
-
-function ARCLib.GetPlayerByUserID(steamid) -- Gets a player by their "ARCLib.UserID"
-	local ply = {}
-	if !isstring(steamid) then return {} end
-	for _, v in pairs( player.GetHumans() ) do
-		if ARCLib.GetUserID(v) == steamid then
-			ply = v;
-		end
-	end
-	if !IsValid(ply) then
-		function ply:SteamID() return "STEAM_0:0:0" end
-		ply._ARCFakeUserID = steamid
 		function ply:Nick() return "[Player Offline]" end
 		function ply:IsPlayer() return false end
 		function ply:IsValid() return false end

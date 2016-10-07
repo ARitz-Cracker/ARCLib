@@ -5,7 +5,7 @@ function ARCLib.AddAddonConcommand(addon,command)
 		if _G[addon].Commands[comm] then
 			
 			if _G[addon].Commands[comm].adminonly && IsValid(ply) && !table.HasValue(_G[addon].Settings.admins,string.lower(ply:GetUserGroup())) then
-				ARCLib.PlaceholderReplace(ARCBank.Msgs.CommandOutput.AdminCommand,{RANKS=table.concat( _G[addon].Settings.admins, ", " )})
+				_G[addon].MsgCL(ply,ARCLib.PlaceholderReplace(_G[addon].Msgs.CommandOutput.AdminCommand,{RANKS=table.concat( _G[addon].Settings.admins, ", " )}))
 			return end
 			
 			if IsValid(ply) then
