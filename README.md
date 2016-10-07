@@ -91,3 +91,4 @@ type can be either ARCLib.ICON_16, ARCLib.ICON_32, ARCLib.ICON_16_GRAY or ARCLib
 * ```ENT:ARCLib_SetAnimation(animation)``` (Shared) this makes the entity's model play an animation!
 * ```ARCLib.DeleteAll(dir)``` (Shared) deletes a folder and everything in it
 * Everything in the shared/maths.lua !!!
+* ```ARCLib.IsVersion(version,addon)``` Compares version to _G["addon"].Version this function is used for comparing versions with a syntax like "1.3.4". For example, if I wanted ARCBank v1.3.4, and v1.3.6 was installed, ```ARCLib.IsVersion("1.3.4","ARCBank")``` would return true.
