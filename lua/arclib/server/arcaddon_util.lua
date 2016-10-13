@@ -6,11 +6,9 @@ function ARCLib.AddAddonConcommand(addon,command)
 		local comm = args[1]
 		table.remove( args, 1 )
 		if _G[addon].Commands[comm] then
-			
 			if _G[addon].Commands[comm].adminonly && IsValid(ply) && !table.HasValue(_G[addon].Settings.admins,string.lower(ply:GetUserGroup())) then
 				_G[addon].MsgCL(ply,ARCLib.PlaceholderReplace(_G[addon].Msgs.CommandOutput.AdminCommand,{RANKS=table.concat( _G[addon].Settings.admins, ", " )}))
 			return end
-			
 			if IsValid(ply) then
 				local shitstring = ply:Nick().." ("..ply:SteamID()..") used the command: "..comm
 				for i=1,#args do

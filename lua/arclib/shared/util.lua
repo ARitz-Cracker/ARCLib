@@ -107,7 +107,7 @@ if CLIENT then
 		local msg = net.ReadString() 
 		local typ = net.ReadUInt(4)
 		local time = net.ReadUInt(16)
-		local sound = tobool(net.ReadBit())
+		local snd = tobool(net.ReadBit())
 		notification.AddLegacy(msg,typ,time) 
 		if snd then
 			if typ == NOTIFY_ERROR then
