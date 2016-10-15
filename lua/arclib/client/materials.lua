@@ -10,6 +10,7 @@ end
 
 -- Returns a material based on a file in the /data folder. TODO: Is the typ paramitar required?
 function ARCLib.MaterialFromTxt(mat,typ,param)
+	ErrorNoHalt( "ARCLib.MaterialFromTxt is depreciated as GMod now allows for images to be written in the data folder." )
 	typ = string.lower(typ)
 	assert(typ == "png" || typ == "jpg","ARCLib.MaterialFromTxt: Second argument is not \"png\" or \"jpg\"")
 	local ret = Material("../data/" .. mat .. "\n."..typ, param)

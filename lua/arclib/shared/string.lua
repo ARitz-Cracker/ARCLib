@@ -30,7 +30,7 @@ langtab.forever = "forever"
 langtab.now = "now"
 
 function ARCLib.TimeString(sec,tab) -- Converts seconds to a human-readable form. Also, string.NiceTime is terrible.
-	if(!istable(tab) || #tab == 0 )then -- I don't really like this, but it's for the sake of making it translatable!
+	if(!istable(tab))then -- I don't really like this, but it's for the sake of making it translatable!
 		tab = langtab
 	end
 	if !sec || !isnumber(sec) || sec == math.huge then

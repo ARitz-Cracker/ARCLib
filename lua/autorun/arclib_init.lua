@@ -3,8 +3,8 @@ ARCLib = ARCLib or {}
 function ARCLib.Msg(msg)
 	Msg("ARCLib: "..tostring(msg).."\n")
 end
-ARCLib.Version = "1.6.0"
-ARCLib.Update = "October 7th 2016"
+ARCLib.Version = "1.6.0b"
+ARCLib.Update = "October 15th 2016"
 ARCLib.Msg("ARitz Cracker's Libraries")
 ARCLib.Msg("Version: "..ARCLib.Version)
 ARCLib.Msg("Updated on: "..ARCLib.Update)
