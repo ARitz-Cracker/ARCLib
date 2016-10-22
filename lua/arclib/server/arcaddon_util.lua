@@ -42,7 +42,6 @@ function ARCLib.SetAddonLanguage(addon)
 			translations.msgs = ARCBank.Msgs
 			translations.settingsdesc = ARCBank.SettingsDesc
 			]]
-			//local compressedstir
 			_G[addon].JSON_Lang = ARCLib.SplitString(util.Compress(lanstr),49152) -- Splitting the string every 48 kb just in case
 			for k,v in pairs(player.GetHumans()) do
 				ARCLib.SendAddonLanguage(addon,v)
@@ -54,7 +53,80 @@ function ARCLib.SetAddonLanguage(addon)
 		_G[addon].Msg("WARNING! The language file '"..tostring(lang).."' wasn't found!")
 	end
 end
-
+function ARCLib.LoadDefaultLanguages(addon,url,callback,retries)
+	retries = tonumber(retries) or 0
+	local dir = _G[addon].Dir.."/languages"
+	local langs = {}
+	if !file.IsDir( dir,"DATA" ) then
+		ARCLib.Msg("Created Folder: "..dir)
+		file.CreateDir(dir)
+	end
+	local files, _ = file.Find( dir.."/*.txt", "DATA" )
+	for i=1,#files do
+		local fname = string.sub( files[i], 1, #files[i]-4 )
+		langs[fname] = fname
+	end
+	http.Fetch( url,
+		function( body, len, headers, code )
+			if code == 200 then
+				
+				local tab = util.JSONToTable(body)
+				if !istable(tab) then
+					ARCLib.Msg(url.." is not valid JSON")
+					callback()
+					return
+				end
+				ARCLib.ForEachAsync(tab,function(k,v,callback)
+					http.Fetch( v,
+						function( body, len, headers, code )
+							if code == 200 then
+								local parts = string.Explode( "/", v )
+								local filename = parts[#parts]
+								local langname = string.sub( filename, 1, #filename-4 )
+								local key = table.KeyFromValue( langs, langname )
+								if (key) then
+									langs[key] = nil
+								end
+								
+								langs[k] = langname
+								file.Write(dir.."/"..filename,body)
+							else
+								ARCLib.Msg(v.." returned HTTP status "..code)
+							end
+							callback()
+						end,
+						function( err )
+							ARCLib.Msg("Failed to connect to "..url)
+							callback()
+						end
+					)
+				end,
+				function()
+					callback(langs)
+				end)
+			else
+				if (retries > 5) then
+					ARCLib.Msg(url.." returned HTTP status "..code)
+					callback(langs)
+					return
+				end
+				
+				retries = retries + 1
+				ARCLib.LoadDefaultLanguages(addon,url,callback,retries)
+			end
+		end,
+		function( err )
+			if (retries > 5) then
+				ARCLib.Msg("Failed to connect to "..url.." after 10 retries. ("..err..")")
+				callback(langs)
+				return
+			end
+			retries = retries + 1
+			ARCLib.LoadDefaultLanguages(addon,url,callback,retries)
+		end
+	)
+	
+end
 
 util.AddNetworkString( "arclib_comm_lang" )
 function ARCLib.SendAddonLanguage(addon,v)

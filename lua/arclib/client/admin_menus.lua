@@ -2,8 +2,11 @@
 
 net.Receive( "arclib_comm_client_settings", function(length)
 	local addon = net.ReadString()
-	local len = net.ReadUInt(32)
 	if _G[addon] && _G[addon].Settings then
+		_G[addon].SettingType = net.ReadTable()
+		local len = net.ReadUInt(32)
+		_G[addon].SettingMultichoices = util.JSONToTable(util.Decompress(net.ReadData(len)))
+		len = net.ReadUInt(32)
 		_G[addon].Settings = util.JSONToTable(util.Decompress(net.ReadData(len)))
 		if _G[addon].OnSettingChanged then
 			for k,v in pairs(_G[addon].Settings) do
@@ -20,7 +23,7 @@ net.Receive( "arclib_comm_client_settings_changed", function(length)
 	local val
 	if typ == TYPE_NUMBER then
 		val = net.ReadDouble()
-	elseif typ == TYPE_STRING then
+	elseif typ == TYPE_STRING || typ == TYPE_ARCLIB_MULTICHOICE then
 		val = net.ReadString()
 	elseif typ == TYPE_BOOL then
 		val = tobool(net.ReadBit())
@@ -77,98 +80,117 @@ function ARCLib.AddonConfigMenu(addon,cmd)
 	SettingDesc:SetSize( 265, 50 )
 --		SettingDesc:SizeToContents() -- Size the label to fit the text in it
 	SettingDesc:SetDark( 1 ) -- Set the colour of the text inside the label to a darker one
-	local SettingBool = vgui.Create( "DCheckBoxLabel", SettingsContainer )
-	SettingBool:SetPos( 12, 92 )
-	SettingBool:SetText( "Enable" )
-	SettingBool:SetValue( 1 )
-	SettingBool:SizeToContents()
-	SettingBool:SetVisible(false)
-	SettingBool:SetDark( 1 )
-	local SettingNum = vgui.Create( "DNumberWang", SettingsContainer )
-	SettingNum:SetPos( 10, 92 )
-	SettingNum:SetSize( 265, 20 )
-	SettingNum:SetValue( 1 )
-	SettingNum:SetVisible(false)
-	SettingNum:SetMinMax( 0 , 1000000 )
-	SettingNum:SetDecimals(4)
-	local SettingStr = vgui.Create( "DTextEntry", SettingsContainer )
-	SettingStr:SetPos( 12,92 )
-	SettingStr:SetTall( 20 )
-	SettingStr:SetWide( 265 )
-	SettingStr:SetVisible(false)
-	SettingStr:SetEnterAllowed( true )
-	local SettingsTabContainer = vgui.Create( "DPanel",SettingsContainer)
-	SettingsTabContainer:SetPos(10,92)
-	SettingsTabContainer:SetSize( 265, 50 )
-	SettingsTabContainer:SetVisible(false)
-	local SettingTab = vgui.Create( "DComboBox", SettingsTabContainer )
+	
+	local SettingSelectors = {}
+	
+	SettingSelectors[TYPE_BOOL] = vgui.Create( "DCheckBoxLabel", SettingsContainer )
+	SettingSelectors[TYPE_BOOL]:SetPos( 12, 92 )
+	SettingSelectors[TYPE_BOOL]:SetText( "Enable" )
+	SettingSelectors[TYPE_BOOL]:SetValue( 1 )
+	SettingSelectors[TYPE_BOOL]:SizeToContents()
+	SettingSelectors[TYPE_BOOL]:SetVisible(false)
+	SettingSelectors[TYPE_BOOL]:SetDark( 1 )
+	SettingSelectors[TYPE_NUMBER] = vgui.Create( "DNumberWang", SettingsContainer )
+	SettingSelectors[TYPE_NUMBER]:SetPos( 10, 92 )
+	SettingSelectors[TYPE_NUMBER]:SetSize( 265, 20 )
+	SettingSelectors[TYPE_NUMBER]:SetValue( 1 )
+	SettingSelectors[TYPE_NUMBER]:SetVisible(false)
+	SettingSelectors[TYPE_NUMBER]:SetMinMax( 0 , 1000000 )
+	SettingSelectors[TYPE_NUMBER]:SetDecimals(4)
+	SettingSelectors[TYPE_STRING] = vgui.Create( "DTextEntry", SettingsContainer )
+	SettingSelectors[TYPE_STRING]:SetPos( 12,92 )
+	SettingSelectors[TYPE_STRING]:SetTall( 20 )
+	SettingSelectors[TYPE_STRING]:SetWide( 265 )
+	SettingSelectors[TYPE_STRING]:SetVisible(false)
+	SettingSelectors[TYPE_STRING]:SetEnterAllowed( true )
+	SettingSelectors[TYPE_TABLE] = vgui.Create( "DPanel",SettingsContainer)
+	SettingSelectors[TYPE_TABLE]:SetPos(10,92)
+	SettingSelectors[TYPE_TABLE]:SetSize( 265, 50 )
+	SettingSelectors[TYPE_TABLE]:SetVisible(false)
+	
+	SettingSelectors[TYPE_ARCLIB_MULTICHOICE] = vgui.Create( "DComboBox", SettingsContainer )
+	SettingSelectors[TYPE_ARCLIB_MULTICHOICE]:SetPos( 12,92 )
+	SettingSelectors[TYPE_ARCLIB_MULTICHOICE]:SetTall( 20 )
+	SettingSelectors[TYPE_ARCLIB_MULTICHOICE]:SetWide( 265 )
+	SettingSelectors[TYPE_ARCLIB_MULTICHOICE]:SetVisible(false)
+	
+	local SettingTab = vgui.Create( "DComboBox", SettingSelectors[TYPE_TABLE] )
 	SettingTab:SetPos( 0,0 )
 	SettingTab:SetSize( 210, 20 )
 	function SettingTab:OnSelect(index,value,data)
 		SettingTab.Selection = value
 	end
-	local SettingTaba = vgui.Create( "DTextEntry", SettingsTabContainer )
+	local SettingTaba = vgui.Create( "DTextEntry", SettingSelectors[TYPE_TABLE] )
 	SettingTaba:SetPos( 0,30 )
 	SettingTaba:SetTall( 20 )
 	SettingTaba:SetWide( 210 )
 	--SettingTaba:SetVisible(false)
 	SettingTaba:SetEnterAllowed( true )
 
-	local SettingRemove = vgui.Create( "DButton", SettingsTabContainer )
+	local SettingRemove = vgui.Create( "DButton", SettingSelectors[TYPE_TABLE] )
 	SettingRemove:SetText( "Remove" )
 	SettingRemove:SetPos( 210, 0 )
 	SettingRemove:SetSize( 55, 20 )
-	local SettingAdd = vgui.Create( "DButton", SettingsTabContainer )
+	local SettingAdd = vgui.Create( "DButton", SettingSelectors[TYPE_TABLE] )
 	SettingAdd:SetText( "Add" )
 	SettingAdd:SetPos( 210, 30)
 	SettingAdd:SetSize( 55, 20 )
 
-	function AList1:OnSelect(index,value,data)
-		SettingDesc:SetText("Description:\n"..tostring(_G[addon].SettingsDesc[value]));
+	function AList1:OnSelect(index,setting,data)
+		local typ = _G[addon].SettingType[setting] || TypeID(settings[setting])
+	
+		SettingDesc:SetText(tostring(_G[addon].SettingsDesc[setting]))
+		
+		for k,v in pairs(SettingSelectors) do
+			v:SetVisible(k == typ)
+		end
 		--SettingDesc:SizeToContents();
-			SettingBool.OnChange = function( pan, val ) end
-			SettingStr.OnValueChanged = function( pan, val ) end
-			SettingStr.OnEnter = function() end
-			SettingNum.OnValueChanged = function( pan, val ) end
-		if isnumber(settings[value]) then
-			SettingBool:SetVisible(false)
-			SettingNum:SetVisible(true)
-			SettingStr:SetVisible(false)
-			SettingsTabContainer:SetVisible(false)
-			SettingNum:SetValue( settings[value] )
-			SettingNum.OnValueChanged = function( pan, val )
-				RunConsoleCommand( cmd,"settings",value,tostring(val))
+		SettingSelectors[TYPE_BOOL].OnChange = NULLFUNC
+		SettingSelectors[TYPE_STRING].OnValueChanged = NULLFUNC
+		SettingSelectors[TYPE_STRING].OnEnter = NULLFUNC
+		SettingSelectors[TYPE_NUMBER].OnValueChanged = NULLFUNC
+		SettingSelectors[TYPE_ARCLIB_MULTICHOICE].OnSelect = NULLFUNC
+			
+		if typ == TYPE_NUMBER then
+			SettingSelectors[TYPE_NUMBER]:SetValue( settings[setting] )
+			SettingSelectors[TYPE_NUMBER].OnValueChanged = function( pan, val )
+				RunConsoleCommand( cmd,"settings",setting,tostring(val))
 			end
-		elseif istable(settings[value]) then
-			SettingNum:SetVisible(false)
-			SettingBool:SetVisible(false)
-			SettingStr:SetVisible(false)
-			SettingsTabContainer:SetVisible(true)
+		elseif typ == TYPE_ARCLIB_MULTICHOICE then
+			SettingSelectors[TYPE_ARCLIB_MULTICHOICE]:Clear()
+			for k,v in pairs(_G[addon].SettingMultichoices[setting]) do
+				SettingSelectors[TYPE_ARCLIB_MULTICHOICE]:AddChoice( k, v )
+			end
+			SettingSelectors[TYPE_ARCLIB_MULTICHOICE]:SetText(settings[setting])
+			SettingSelectors[TYPE_ARCLIB_MULTICHOICE].OnSelect = function( panel, index, value )
+				print( RunConsoleCommand( cmd,"settings",setting , panel:GetOptionData( index )))
+			end
+		elseif typ == TYPE_TABLE then
 			SettingTab:Clear()
 			SettingTab.Selection = ""
-			for k,v in pairs(settings[value]) do
+			for k,v in pairs(settings[setting]) do
 				SettingTab:AddChoice(v)
 			end
 			SettingAdd.DoClick = function()
 				
-				table.insert( settings[value], SettingTaba:GetValue() )
+				table.insert( settings[setting], SettingTaba:GetValue() )
 				string.Replace(SettingTaba:GetValue(), ",", "_")
 				local s = ""
-				for o,p in pairs(settings[value]) do
+				for o,p in pairs(settings[setting]) do
 					if o > 1 then
 						s = s..","..p
 					else
 						s = p
 					end
 				end
-				RunConsoleCommand( cmd,"settings",value,s)
+				RunConsoleCommand( cmd,"settings",setting,s)
 				SettingTab:AddChoice(SettingTaba:GetValue())
 				SettingTaba:SetValue("")
 			end	
 			SettingRemove.DoClick = function()
-				table.RemoveByValue( settings[value], SettingTab.Selection )
+				table.RemoveByValue( settings[setting], SettingTab.Selection )
 				local s = ""
-				for o,p in pairs(settings[value]) do
+				for o,p in pairs(settings[setting]) do
 					if o > 1 then
 						s = s..","..p
 					else
@@ -176,31 +198,23 @@ function ARCLib.AddonConfigMenu(addon,cmd)
 					end
 				end
 				SettingTab:Clear()
-				for k,v in pairs(settings[value]) do
+				for k,v in pairs(settings[setting]) do
 					SettingTab:AddChoice(v)
 				end
-				RunConsoleCommand( cmd,"settings",value,s)
+				RunConsoleCommand( cmd,"settings",setting,s)
 			end
-		elseif isstring(settings[value]) then
-			SettingNum:SetVisible(false)
-			SettingBool:SetVisible(false)
-			SettingStr:SetVisible(true)
-			SettingsTabContainer:SetVisible(false)
-			SettingStr:SetValue( settings[value] )
-			SettingStr.OnKeyCodeTyped = function( pan, val )
-				RunConsoleCommand( cmd,"settings",value,SettingStr:GetValue())
+		elseif typ == TYPE_STRING then
+			SettingSelectors[TYPE_STRING]:SetValue( settings[setting] )
+			SettingSelectors[TYPE_STRING].OnKeyCodeTyped = function( pan, val )
+				RunConsoleCommand( cmd,"settings",setting,SettingSelectors[TYPE_STRING]:GetValue())
 			end
-			SettingStr.OnEnter = function()
-				RunConsoleCommand( cmd, "settings",value,SettingStr:GetValue())
+			SettingSelectors[TYPE_STRING].OnEnter = function()
+				RunConsoleCommand( cmd, "settings",setting,SettingSelectors[TYPE_STRING]:GetValue())
 			end
-		elseif isbool(settings[value]) then
-			SettingNum:SetVisible(false)
-			SettingBool:SetVisible(true)
-			SettingStr:SetVisible(false)
-			SettingsTabContainer:SetVisible(false)
-			SettingBool:SetValue( ARCLib.BoolToNumber(settings[value]) )
-			SettingBool.OnChange = function( pan, val )
-				RunConsoleCommand( cmd, "settings",value,tostring(val))
+		elseif typ == TYPE_BOOL then
+			SettingSelectors[TYPE_BOOL]:SetValue( ARCLib.BoolToNumber(settings[setting]) )
+			SettingSelectors[TYPE_BOOL].OnChange = function( pan, val )
+				RunConsoleCommand( cmd, "settings",setting,tostring(val))
 			end
 		end
 	end

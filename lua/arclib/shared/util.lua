@@ -41,7 +41,25 @@ function ARCLib.AddDir(dir) -- recursively adds everything in a directory to be 
 	end
 end
 
-
+function ARCLib.ForEachAsync(tab,func,done)
+	local total = 0;
+	local progess = 0;
+	for k,v in pairs(tab) do
+		total = total + 1;
+	end
+	if (total == 0) then
+		timer.Simple(0,done)
+	else
+		for k,v in pairs(tab) do
+			func(k,v,function()
+				progess = progess + 1
+				if (progess==total) then
+					timer.Simple(0,done)
+				end
+			end)
+		end
+	end
+end
 
 function ARCLib.RGBToCMY(col)
 	return {c = (1 - col.r / 255)*255,m = (1 - col.g / 255)*255,y = (1 - col.b / 255)*255,a = col.a}

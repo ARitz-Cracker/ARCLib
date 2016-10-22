@@ -1,5 +1,5 @@
 ARCLib = ARCLib or {}
-
+NULLFUNC = function(...) end
 function ARCLib.Msg(msg)
 	Msg("ARCLib: "..tostring(msg).."\n")
 end

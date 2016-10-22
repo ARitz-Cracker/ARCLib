@@ -5,11 +5,14 @@ ARCLib.AddonsUsingSettings = {}
 util.AddNetworkString("arclib_comm_client_settings")
 
 function ARCLib.SendAddonSettings(addon,ply) 
-
 	if _G[addon] && _G[addon].Settings then
 		local data = util.Compress(util.TableToJSON(_G[addon].Settings))
+		local data2 = util.Compress(util.TableToJSON(_G[addon].SettingMultichoices))
 		net.Start("arclib_comm_client_settings")
 		net.WriteString(addon)
+		net.WriteTable(_G[addon].SettingType)
+		net.WriteUInt(#data2,32)
+		net.WriteData(data2,#data2)
 		net.WriteUInt(#data,32)
 		net.WriteData(data,#data)
 		net.Send(ply)
@@ -19,14 +22,14 @@ end
 util.AddNetworkString("arclib_comm_client_settings_changed")
 function ARCLib.UpdateAddonSetting(addon,setting,ply)
 	if _G[addon] && _G[addon].Settings && _G[addon].Settings[setting] != nil then
-		local typ = TypeID(_G[addon].Settings[setting])
+		local typ = _G[addon].SettingType[setting] || TypeID(_G[addon].Settings[setting])
 		net.Start("arclib_comm_client_settings_changed")
 		net.WriteString(addon)
 		net.WriteUInt(typ,16)
 		net.WriteString(setting)
 		if typ == TYPE_NUMBER then
 			net.WriteDouble(_G[addon].Settings[setting])
-		elseif typ == TYPE_STRING then
+		elseif typ == TYPE_STRING || typ == TYPE_ARCLIB_MULTICHOICE then
 			net.WriteString(_G[addon].Settings[setting])
 		elseif typ == TYPE_BOOL then
 			net.WriteBit(_G[addon].Settings[setting])
@@ -36,13 +39,16 @@ function ARCLib.UpdateAddonSetting(addon,setting,ply)
 			error("Server attempted to send unknown setting type. (wat)")
 		end
 		net.Send(ply)
+		if setting == "language" then
+			ARCLib.SetAddonLanguage(addon)
+		end
 	end
 end
 
 function ARCLib.AddSettingConsoleCommands(addon)
-
+	
 	local VarTypeExamples = {}
-	VarTypeExamples["list"] = {"aritz,snow,cathy,kenzie,isaac,tasha,bubby","bob,joe,frank,bill","red,green,blue,yellow","lol,wtf,omg,rly"}
+	VarTypeExamples["list"] = {"aritz,snow,cathy,kenzie,isaac,tasha,bubby","bob,joe,frank,bill","red,green,blue,yellow","lol,wtf,omg,rly"} -- Every day is soul crushing, I cannot wait for long.
 	VarTypeExamples["number"] = {"1337","15","27","9","69","19970415"}
 	VarTypeExamples["boolean"] = {"true","false"}
 	VarTypeExamples["string"] = {"word","helloworld","iloveyou","MONEY!","bob","aritz"}
@@ -176,6 +182,8 @@ end
 
 
 function ARCLib.AddonLoadSettings(addon,backward)
+	_G[addon].SettingType = _G[addon].SettingType or {}
+	_G[addon].SettingMultichoices = _G[addon].SettingMultichoices or {}
 	ARCLib.AddonsUsingSettings[addon] = true
 	if file.Exists(_G[addon].Dir.."/_saved_settings.txt","DATA") then
 		local disksettings = util.JSONToTable(file.Read(_G[addon].Dir.."/_saved_settings.txt","DATA"))
@@ -203,6 +211,16 @@ function ARCLib.AddonLoadSettings(addon,backward)
 		_G[addon].Msg("No settings file found! Using defaults.")
 	end
 	ARCLib.SendAddonSettings(addon,player.GetHumans())
+end
+
+function ARCLib.AddonAddSettingMultichoice(addon,setting,multichoice)
+	_G[addon].SettingMultichoices = _G[addon].SettingMultichoices or {}
+	_G[addon].SettingType = _G[addon].SettingType or {}
+	_G[addon].SettingMultichoices[setting] = {}
+	for k,v in pairs(multichoice) do
+		_G[addon].SettingMultichoices[setting][k] = v
+	end
+	_G[addon].SettingType[setting] = TYPE_ARCLIB_MULTICHOICE
 end
 
 function ARCLib.AddonLoadSpecialSettings(addon)
