@@ -49,3 +49,54 @@ net.Receive( "arclib_comm_lang", function(length)
 	end
 end)
 
+local thing = file.Exists( "arc_stop_bugging_me.txt", "DATA" )
+
+function ARCLib.ThanksMessage()
+	if thing then return end
+	
+	local msg = [[Heyo there, ]]..LocalPlayer():Nick()..[[! Thank you so much for being awesome and purchasing my addons! :)
+It means so much to me that people like you think my stuff is good enough to support.
+
+If you need help with absolutly anything regarding my addons, feel free to contact me by submitting a support ticket on scriptfodder.com.
+You can do this by pressing the blue "SUPPORT" button on the addon purchase page.
+
+I wouldn't be successful without each and every one of my good customers. (Especially yourself!) So again, thank you.
+
+-ARitz Cracker]]
+	
+	local Window = vgui.Create( "DFrame" )
+	Window:SetSize( 420,340 )
+	Window:Center()
+	Window:SetTitle( "A message from ARitz Cracker" )
+	Window:SetVisible( true )
+	Window:SetDraggable( true )
+	--Window:ShowCloseButton( true )
+	Window:MakePopup()
+
+	local DLabel = vgui.Create( "DLabel", Window )
+	DLabel:SetText( msg )
+	DLabel:SetPos( 10, 30 )
+	DLabel:SetWidth(380)
+	DLabel:SetHeight(200)
+	DLabel:SetWrap(true)
+	--DLabel:SizeToContents()
+	
+	local SorryButt = vgui.Create( "DButton", Window )
+	SorryButt:SetText("  I also wanted to apologize for some things I've done (and haven't done) in the\n  past. Please read this if you have the time.")
+	SorryButt:SetPos( 5, 240 )
+	SorryButt:SetSize( 410, 40 )
+	SorryButt.DoClick = function()
+		gui.OpenURL( "http://www.aritzcracker.ca/makeshift_blog/sorry.html" )
+	end
+	local CloseButt = vgui.Create( "DButton", Window )
+	CloseButt:SetText("Click here to never show this message again")
+	CloseButt:SetPos( 5, 290 )
+	CloseButt:SetSize( 410, 40 )
+	CloseButt.DoClick = function()
+		file.Write("arc_stop_bugging_me.txt",msg)
+		Window:Close()
+	end
+	thing = true
+end
+
+net.Receive("arclib_thankyou",ARCLib.ThanksMessage)

@@ -151,7 +151,6 @@ else
 		net.WriteUInt(time,16)
 		net.WriteBit(snd)
 		net.Send(ply)
-	
 	end
 	-- Message, Type (NOTIFY_), time (seconds), Should we play a sound or not?
 	function ARCLib.NotifyBroadcast(str,typ,time,snd)

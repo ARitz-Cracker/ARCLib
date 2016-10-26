@@ -1,4 +1,5 @@
 
+util.AddNetworkString("arclib_thankyou")
 ARCLib.AddonsUsingLanguages = {}
 
 function ARCLib.AddAddonConcommand(addon,command) 
