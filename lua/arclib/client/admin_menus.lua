@@ -55,6 +55,8 @@ function ARCLib.AddonConfigMenu(addon,cmd)
 
 	
 	local settings = _G[addon].Settings
+	PrintTable(settings)
+	MsgN(settings["money_max_1_standard"])
 	local SettingsContainer = vgui.Create( "DPanel",SettingsWindow)
 	SettingsContainer:SetPos( 5, 30 )
 	SettingsContainer:SetSize( 285, 180 )
@@ -95,7 +97,7 @@ function ARCLib.AddonConfigMenu(addon,cmd)
 	SettingSelectors[TYPE_NUMBER]:SetSize( 265, 20 )
 	SettingSelectors[TYPE_NUMBER]:SetValue( 1 )
 	SettingSelectors[TYPE_NUMBER]:SetVisible(false)
-	SettingSelectors[TYPE_NUMBER]:SetMinMax( 0 , 1000000 )
+	SettingSelectors[TYPE_NUMBER]:SetMinMax( 0 , 99999999999999 )
 	SettingSelectors[TYPE_NUMBER]:SetDecimals(4)
 	SettingSelectors[TYPE_STRING] = vgui.Create( "DTextEntry", SettingsContainer )
 	SettingSelectors[TYPE_STRING]:SetPos( 12,92 )

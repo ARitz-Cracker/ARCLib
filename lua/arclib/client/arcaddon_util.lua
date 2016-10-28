@@ -70,7 +70,7 @@ I wouldn't be successful without each and every one of my good customers. (Espec
 	Window:SetTitle( "A message from ARitz Cracker" )
 	Window:SetVisible( true )
 	Window:SetDraggable( true )
-	--Window:ShowCloseButton( true )
+	Window:ShowCloseButton( true )
 	Window:MakePopup()
 
 	local DLabel = vgui.Create( "DLabel", Window )
