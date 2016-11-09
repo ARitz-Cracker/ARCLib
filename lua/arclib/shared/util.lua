@@ -1,5 +1,35 @@
 --Random utilities
 
+local thinkFuncs = {}
+local thinkThreads = {}
+local thinkDefs = {}
+
+hook.Add("Think","ARCLib Multithink",function()
+	for k,v in pairs(thinkFuncs) do
+		if !thinkThreads[k] then -- Check if it's dead here too?
+			thinkThreads[k] = coroutine.create(v) 
+		end
+	end
+	local stime = SysTime()
+	while SysTime() - stime < 0.001 do
+		for k,v in pairs(thinkThreads) do
+			if (coroutine.status(v) == "dead") then
+				thinkThreads[k] = nil
+			else
+				local succ,err = coroutine.resume(v)
+				if !succ then
+					ErrorNoHalt( "[ARCLib think failed!] "..thinkDefs[k].."\n\t"..err )
+					thinkThreads[k] = nil
+				end
+			end
+		end
+	end
+end)
+
+function ARCLib.AddThinkFunc(name,func)
+	thinkFuncs[name] = func
+	thinkDefs[name] = debug.getinfo(func).source
+end
 
 -- Gets the IP of the server
 function ARCLib.GetIP()
