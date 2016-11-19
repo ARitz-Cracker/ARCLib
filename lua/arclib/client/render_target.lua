@@ -213,7 +213,7 @@ function ARCLib.CaptureRenderTarget(name,format,quality,callback)
 end
 
 function ARCLib.DestroyRenderTarget(name)
-	--RTs[name] = nil --TODO: There's a GetRenderTarget, but there is no KillRenderTarget??
+	RTs[name] = nil --TODO: There's a GetRenderTarget, but there is no KillRenderTarget??
 end
 
 function ARCLib.GetRenderTargetTexture(name)

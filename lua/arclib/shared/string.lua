@@ -139,6 +139,7 @@ end
 
 
 function ARCLib.UTF8_Split(str)
+	str = utf8.force(str) 
 	local tab = {}
 	local i = 0
 	for k,v in utf8.codes( str ) do
@@ -210,6 +211,7 @@ end
 
 function ARCLib.CutOutText(text,font,length) -- Makes the trailing "..." if the text is too wide
 	if !isstring(text) then return type(text) end
+	text = utf8.force( text ) 
 	local hash = util.CRC(text..font..length)
 	if ARCLib.CachedStringsCut[hash] then -- I wonder if this will actually save performance...
 		return ARCLib.CachedStringsCut[hash]
@@ -261,6 +263,7 @@ function ARCLib.ScrollChars(str,place,len)
 		place = 1
 	end
 	if len > 0 then
+		str = utf8.force(str)
 		local i = 1
 		for k,v in utf8.codes( str ) do
 			if i >= place then
@@ -307,6 +310,7 @@ end
 
 function ARCLib.FitText(text,font,length,incoroutine)
 	if !isstring(text) then return {type(text)} end
+	text = utf8.force(text)
 	local hash
 	if !incoroutine then
 		hash = util.CRC(text..font..length)
@@ -399,6 +403,7 @@ end
 
 function ARCLib.FitTextRealtime(text,font,length,callback) -- Splits strings for text boxes. (length) is in pix. Supports "\n"
 	-- Realtime version, this was made so that your computer doesn't freeze while processing massive amounts of text.
+	text = utf8.force(text)
 	if (ARCLib.CR.Callback) then
 		return ARCLib.CR.Callback(1,{"BUSY"})
 	end
@@ -416,7 +421,7 @@ hook.Add( "Think", "ARCLib Stringthink", function()
 			ARCLib.CR.Callback(0,NULLTABLE)
 		else
 			local stime = SysTime()
-			while SysTime() - stime < 0.01 do
+			while SysTime() - stime < 0.001 do
 				if (coroutine.status(ARCLib.CR.Thread) == "dead") then
 					ARCLib.CR.Callback(1,ARCLib.CR.Table)
 					ARCLib.CR.Progress = -1
