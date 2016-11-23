@@ -71,6 +71,7 @@ function ARCLib.AddDir(dir) -- recursively adds everything in a directory to be 
 	end
 end
 
+
 function ARCLib.ForEachAsync(tab,func,done)
 	local total = 0;
 	local progess = 0;

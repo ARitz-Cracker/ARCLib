@@ -15,6 +15,52 @@ function ARCLib.RandomChars(len)
 	end
 	return string.char(unpack(result))
 end
+local invalidFsChars = {}
+invalidFsChars[47] = true
+invalidFsChars[63] = true
+invalidFsChars[60] = true
+invalidFsChars[62] = true
+invalidFsChars[92] = true
+invalidFsChars[58] = true
+invalidFsChars[42] = true
+invalidFsChars[124] = true
+invalidFsChars[34] = true
+invalidFsChars[94] = true
+function ARCLib.SafeFileName(str) -- fucking WINDOWS and its utf-16 BULLSHIT that GMod doesn't SUPPORT UGH!
+	str = utf8.force(str)
+	local newstr = ""
+	for k, v in utf8.codes( str ) do
+		if v < 32 or invalidFsChars[v] then
+			newstr = newstr .. "_"
+		elseif v > 126 then
+			newstr = newstr .. "~"
+			local b = 32 + math.floor(v/126)
+			while b > 126 do
+				newstr = newstr .. "~"
+				b = b - 126
+			end
+			local c = string.char(b)
+			if invalidFsChars[b] then
+				newstr = newstr .. "_"
+			else
+				newstr = newstr .. (ARCLib.utf8_uc_lc[c] or c)
+			end
+			local mod = v%126
+			if mod > 0 then
+				c = string.char(mod)
+				if mod < 32 or invalidFsChars[mod] then
+					newstr = newstr .. "_"
+				else
+					newstr = newstr .. (ARCLib.utf8_uc_lc[c] or c)
+				end
+			end
+		else
+			local c = string.char(v)
+			newstr = newstr .. (ARCLib.utf8_uc_lc[c] or c)
+		end
+	end
+	return newstr
+end
 
 local langtab = {}
 langtab.nd = "and"
