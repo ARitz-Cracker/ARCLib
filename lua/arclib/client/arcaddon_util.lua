@@ -1,3 +1,16 @@
+
+local function RecursiveAddLanguage(prefix,tab)
+	for k,v in pairs(tab) do
+		if k == "_" then
+			language.Add( string.sub( prefix, 1, #prefix-1 ), v ) 
+		elseif istable(v) then
+			RecursiveAddLanguage(prefix..k..".",v)
+		else
+			language.Add( prefix..k, tostring(v) ) 
+		end
+	end
+end
+
 local UpdateLang_Progress = {}
 local UpdateLang_Chunks = {}
 net.Receive( "arclib_comm_lang", function(length)
@@ -27,6 +40,11 @@ net.Receive( "arclib_comm_lang", function(length)
 					_G[string.upper(addon).."_ERRORSTRINGS"] = ARCLib.RecursiveTableMerge(_G[string.upper(addon).."_ERRORSTRINGS"],tab.errmsgs)
 					_G[addon].Msgs = ARCLib.RecursiveTableMerge(_G[addon].Msgs,tab.msgs)
 					_G[addon].SettingsDesc = ARCLib.RecursiveTableMerge(_G[addon].SettingsDesc,tab.settingsdesc)
+					if _G[addon].MsgsSource then
+						for i=1,#_G[addon].MsgsSource do
+							RecursiveAddLanguage(_G[addon].MsgsSource[i]..".",_G[addon].Msgs[_G[addon].MsgsSource[i]])
+						end
+					end
 				end
 				UpdateLang_Chunks[addon] = ""
 				UpdateLang_Progress[addon] = 0

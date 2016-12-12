@@ -4,7 +4,6 @@ local RTs = {}
 local DRAWING_RT = false
 local UPDATING_RT = false
 ARCLib.TrackRT = false
-MsgN("RELAODED~")
 local unique = 0
 local function generateUniqueName()
 	local result = "__arclib"..unique.."arclib__"
@@ -71,10 +70,10 @@ hook.Add( "RenderScene", "ARCLib RenderRTs", function( wat, skybox )
 	end
 
 end)
-
-hook.Add("PreDrawHalos", "ARCLib HorribleWorkaroundIHaterDoingThis", function()
+local color_nothing = Color( 0, 0, 0, 0 )
+hook.Add("PreDrawHalos", "ARCLib HorribleWorkaroundIHateDoingThis", function()
 	if UPDATING_RT then
-		halo.Add({LocalPlayer()}, Color(0,0,255,0),0,0,0)
+		halo.Add({LocalPlayer()}, color_nothing,0,0,0)
 	end
 end)
 
