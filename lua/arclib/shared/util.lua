@@ -11,17 +11,22 @@ hook.Add("Think","ARCLib Multithink",function()
 		end
 	end
 	local stime = SysTime()
-	while SysTime() - stime < 0.001 do
+	while SysTime() - stime < 0.004 do
+		local anyalive = false
 		for k,v in pairs(thinkThreads) do
 			if (coroutine.status(v) == "dead") then
 				thinkThreads[k] = nil
 			else
+				anyalive = true
 				local succ,err = coroutine.resume(v)
 				if !succ then
 					ErrorNoHalt( "[ARCLib think failed!] "..thinkDefs[k].."\n\t"..err )
 					thinkThreads[k] = nil
 				end
 			end
+		end
+		if not anyalive then
+			break
 		end
 	end
 end)

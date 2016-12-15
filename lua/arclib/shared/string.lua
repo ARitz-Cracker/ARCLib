@@ -146,7 +146,7 @@ function ARCLib.TimeString(sec,tab) -- Converts seconds to a human-readable form
 end
 
 
-function ARCLib.SplitString(str,num) -- Splits a string at every num characters
+function ARCLib.SplitString(str,num,yield) -- Splits a string at every num characters
 	if !str then return {"nil"} end
 	local length = string.len(str)
 	if length <= num then return {str} end
@@ -158,6 +158,9 @@ function ARCLib.SplitString(str,num) -- Splits a string at every num characters
 		if i >= curtab*num then
 			curtab = curtab + 1;
 			result[curtab] = ""
+		end
+		if yield then
+			coroutine.yield() 
 		end
 	end
 	return result
