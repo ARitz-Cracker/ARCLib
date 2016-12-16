@@ -49,7 +49,7 @@ if SERVER then
 			net.Send(ply)
 		end
 	end)
-	function ARCLib.RegisterBigMessage(name,chunksize,chunklimit)
+	function ARCLib.RegisterBigMessage(name,chunksize,chunklimit,serverToClientOnly)
 		if identifiers > 255 then
 			error("ARCLib.RegisterBigMessage: There can't be more than 256 big messages registered. If this happens, ask ARitz Cracker to use 16 bit identifiers. ")
 		end
@@ -67,6 +67,7 @@ if SERVER then
 		end
 		if bigMessageNames[name] then return end
 		bigMessageNames[name] = {}
+		bigMessageNames[name].serveronly = serverToClientOnly
 		bigMessageNames[name].id = identifiers
 		bigMessageNames[name].chunksize = chunksize
 		bigMessageNames[name].chunklimit = chunklimit
@@ -251,6 +252,15 @@ net.Receive("arclib_big_messages",function(msglen,ply)
 				CallCallback(id,ARCLib.NET_DOWNLOADING_ERROR_LENGTH,0,nil,ply)
 				return
 			end
+			if SERVER and propertyTab.serveronly then
+				net.Start("arclib_big_messages")
+				net.WriteUInt(ARCLib.NET_DOWNLOADING_ERROR,4)
+				net.WriteUInt(id,8)
+				net.WriteUInt(0,8)
+				net.WriteUInt(0,8)
+				net_Send(ply)
+				return
+			end
 			if place == 0 then
 				tab.dlLength = whole
 				tab.dlMsg = ""
@@ -286,7 +296,6 @@ net.Receive("arclib_big_messages",function(msglen,ply)
 				end
 				tab.dlMsg = tab.dlMsg .. msg
 				if tab.dlPlace == tab.dlLength then
-					CallCallback(id,ARCLib.NET_COMPLETE,1,tab.dlMsg,ply)
 					net.Start("arclib_big_messages")
 					net.WriteUInt(ARCLib.NET_DOWNLOADING_ACK,4)
 					net.WriteUInt(id,8)
@@ -296,6 +305,7 @@ net.Receive("arclib_big_messages",function(msglen,ply)
 					tab.dlMsg = ""
 					tab.dlPlace = 0
 					tab.dlLength = 0
+					CallCallback(id,ARCLib.NET_COMPLETE,1,tab.dlMsg,ply)
 				else
 					tab.dlPlace = tab.dlPlace + 1
 					net.Start("arclib_big_messages")
@@ -326,8 +336,8 @@ net.Receive("arclib_big_messages",function(msglen,ply)
 			net.WriteUInt(0,8)
 			net.WriteUInt(0,8)
 			net_Send(ply)
-			tab.upCallbacks[tab.upMsg](ARCLib.NET_UPLOADING_ERROR_LENGTH_MISMATCH,0)
 			NextUpload(ply,id,tab)
+			tab.upCallbacks[tab.upMsg](ARCLib.NET_UPLOADING_ERROR_LENGTH_MISMATCH,0)
 		elseif place == tab.upPlace then
 			net.Start("arclib_big_messages")
 			net.WriteUInt(ARCLib.NET_UPLOADING,4)
@@ -339,8 +349,8 @@ net.Receive("arclib_big_messages",function(msglen,ply)
 			net.WriteUInt(msglen,16)
 			net.WriteData(msg,msglen)
 			net_Send(ply)
-			tab.upCallbacks[tab.upMsg](ARCLib.NET_UPLOADING,tab.upPlace/tab.upLength)
 			tab.upPlace = tab.upPlace + 1
+			tab.upCallbacks[tab.upMsg](ARCLib.NET_UPLOADING,(tab.upPlace-1)/tab.upLength)
 		else
 			net.Start("arclib_big_messages")
 			net.WriteUInt(ARCLib.NET_UPLOADING_ERROR_MISMATCH,4)
@@ -348,17 +358,17 @@ net.Receive("arclib_big_messages",function(msglen,ply)
 			net.WriteUInt(0,8)
 			net.WriteUInt(0,8)
 			net_Send(ply)
-			tab.upCallbacks[tab.upMsg](ARCLib.NET_UPLOADING_ERROR_MISMATCH,0)
 			NextUpload(ply,id,tab)
+			tab.upCallbacks[tab.upMsg](ARCLib.NET_UPLOADING_ERROR_MISMATCH,0)
 		end
 	elseif status == ARCLib.NET_DOWNLOADING_ACK then
 		--Receiver is reporting dl is finished
-		tab.upCallbacks[tab.upMsg](ARCLib.NET_COMPLETE,0)
 		NextUpload(ply,id,tab)
+		tab.upCallbacks[tab.upMsg](ARCLib.NET_COMPLETE,0)
 	elseif status > ARCLib.NET_DOWNLOADING then
 		--Receiver is reporting an error
-		tab.upCallbacks[tab.upMsg](status,0)
 		NextUpload(ply,id,tab)
+		tab.upCallbacks[tab.upMsg](status,0)
 	end
 end)
 
