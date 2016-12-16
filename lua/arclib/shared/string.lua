@@ -145,20 +145,17 @@ function ARCLib.TimeString(sec,tab) -- Converts seconds to a human-readable form
 	return tab.forever
 end
 
-
 function ARCLib.SplitString(str,num,yield) -- Splits a string at every num characters
-	if !str then return {"nil"} end
+	if !isstring(str) then 
+		str = tostring(str)
+	end
 	local length = string.len(str)
 	if length <= num then return {str} end
 	local curtab = 1
 	local result = {}
-	result[curtab] = ""
-	for i=1,length do
-		result[curtab] = result[curtab]..str[i]
-		if i >= curtab*num then
-			curtab = curtab + 1;
-			result[curtab] = ""
-		end
+	for i=1,length,num do
+		result[curtab] = string.sub( str, i, i+num-1 )
+		curtab = curtab + 1
 		if yield then
 			coroutine.yield() 
 		end
