@@ -336,8 +336,10 @@ net.Receive("arclib_big_messages",function(msglen,ply)
 			net.WriteUInt(0,8)
 			net.WriteUInt(0,8)
 			net_Send(ply)
+			local func = tab.upCallbacks[tab.upMsg]
+			timer.Simple(0,function() func(ARCLib.NET_UPLOADING_ERROR_LENGTH_MISMATCH,0) end)
 			NextUpload(ply,id,tab)
-			tab.upCallbacks[tab.upMsg](ARCLib.NET_UPLOADING_ERROR_LENGTH_MISMATCH,0)
+			
 		elseif place == tab.upPlace then
 			net.Start("arclib_big_messages")
 			net.WriteUInt(ARCLib.NET_UPLOADING,4)
@@ -358,17 +360,22 @@ net.Receive("arclib_big_messages",function(msglen,ply)
 			net.WriteUInt(0,8)
 			net.WriteUInt(0,8)
 			net_Send(ply)
+			local func = tab.upCallbacks[tab.upMsg]
+			timer.Simple(0,function() func(ARCLib.NET_UPLOADING_ERROR_MISMATCH,0) end)
 			NextUpload(ply,id,tab)
-			tab.upCallbacks[tab.upMsg](ARCLib.NET_UPLOADING_ERROR_MISMATCH,0)
+			
 		end
 	elseif status == ARCLib.NET_DOWNLOADING_ACK then
 		--Receiver is reporting dl is finished
+		local func = tab.upCallbacks[tab.upMsg]
+		timer.Simple(0,function() func(ARCLib.NET_COMPLETE,0) end)
 		NextUpload(ply,id,tab)
-		tab.upCallbacks[tab.upMsg](ARCLib.NET_COMPLETE,0)
+		
 	elseif status > ARCLib.NET_DOWNLOADING then
 		--Receiver is reporting an error
+		local func = tab.upCallbacks[tab.upMsg]
+		timer.Simple(0,function() func(status,0) end)
 		NextUpload(ply,id,tab)
-		tab.upCallbacks[tab.upMsg](status,0)
 	end
 end)
 
