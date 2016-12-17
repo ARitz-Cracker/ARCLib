@@ -302,10 +302,10 @@ net.Receive("arclib_big_messages",function(msglen,ply)
 					net.WriteUInt(0,8)
 					net.WriteUInt(0,8)
 					net_Send(ply)
-					tab.dlMsg = ""
 					tab.dlPlace = 0
 					tab.dlLength = 0
 					CallCallback(id,ARCLib.NET_COMPLETE,1,tab.dlMsg,ply)
+					tab.dlMsg = ""
 				else
 					tab.dlPlace = tab.dlPlace + 1
 					net.Start("arclib_big_messages")
