@@ -238,5 +238,5 @@ function ARCLib.AddonLoadSpecialSettings(addon)
 	end
 end
 function ARCLib.AddonSaveSpecialSettings(addon)
-	file.Write(_G[addon].Dir.."/_saved_special_settings.txt",util.TableToJSON(_G[addon].SpecialSetting))
+	file.Write(_G[addon].Dir.."/_saved_special_settings.txt",util.TableToJSON(_G[addon].SpecialSettings))
 end
