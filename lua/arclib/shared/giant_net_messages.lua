@@ -164,13 +164,16 @@ end)
 end)
 
 function ARCLib.SendBigMessage(name,data,ply,callback)
+	if SERVER and (not IsValid(ply) or not ply:IsPlayer()) then
+		error("ARCLib.SendBigMessage: Argument #3 is supposed to be a player, but I got some sort of "..type(ply).." thing...")
+	end
 	local m = bigMessageNames[name]
-	if not m then
+	if not m or not m.id then
 		error("ARCLib.SendBigMessage: tried to use an unregistered name!")
 	end
 	local tab = {}
 	tab.name = name
-	tab.data = data
+	tab.data = tostring(data)
 	tab.ply = ply
 	tab.callback = callback
 	pendingUploads[#pendingUploads + 1] = tab
