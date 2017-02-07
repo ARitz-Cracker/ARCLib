@@ -3,14 +3,15 @@ NULLFUNC = function(...) end
 function ARCLib.Msg(msg)
 	Msg("ARCLib: "..tostring(msg).."\n")
 end
-ARCLib.Version = "1.6.3f"
-ARCLib.Update = "December 19th 2016"
+ARCLib.Version = "1.7.0"
+ARCLib.Update = "January 17th 2016"
 ARCLib.Msg("ARitz Cracker's Libraries")
 ARCLib.Msg(table.Random({"My pile-o-spaghetti-code","This library assumes a lot about the addon it loads, doesn't it?","Maybe other people will find this useful.","[Insert witty message here]","These little messages are tradition!"}))
 ARCLib.Msg("Version: "..ARCLib.Version)
 ARCLib.Msg("Updated on: "..ARCLib.Update)
 if SERVER then
 	AddCSLuaFile()
+	
 	local sharedfiles, _ = file.Find( "arclib/shared/*.lua", "LUA" )
 	for i, v in ipairs( sharedfiles ) do
 		AddCSLuaFile( "arclib/shared/"..v )

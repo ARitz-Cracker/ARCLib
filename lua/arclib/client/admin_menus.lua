@@ -55,8 +55,6 @@ function ARCLib.AddonConfigMenu(addon,cmd)
 
 	
 	local settings = _G[addon].Settings
-	PrintTable(settings)
-	MsgN(settings["money_max_1_standard"])
 	local SettingsContainer = vgui.Create( "DPanel",SettingsWindow)
 	SettingsContainer:SetPos( 5, 30 )
 	SettingsContainer:SetSize( 285, 180 )
@@ -87,7 +85,7 @@ function ARCLib.AddonConfigMenu(addon,cmd)
 	
 	SettingSelectors[TYPE_BOOL] = vgui.Create( "DCheckBoxLabel", SettingsContainer )
 	SettingSelectors[TYPE_BOOL]:SetPos( 12, 92 )
-	SettingSelectors[TYPE_BOOL]:SetText( "Enable" )
+	SettingSelectors[TYPE_BOOL]:SetText( _G[addon].Msgs.AdminMenu.Enable or "Enable" )
 	SettingSelectors[TYPE_BOOL]:SetValue( 1 )
 	SettingSelectors[TYPE_BOOL]:SizeToContents()
 	SettingSelectors[TYPE_BOOL]:SetVisible(false)
@@ -130,11 +128,11 @@ function ARCLib.AddonConfigMenu(addon,cmd)
 	SettingTaba:SetEnterAllowed( true )
 
 	local SettingRemove = vgui.Create( "DButton", SettingSelectors[TYPE_TABLE] )
-	SettingRemove:SetText( "Remove" )
+	SettingRemove:SetText( _G[addon].Msgs.AdminMenu.Remove or "Remove" )
 	SettingRemove:SetPos( 210, 0 )
 	SettingRemove:SetSize( 55, 20 )
 	local SettingAdd = vgui.Create( "DButton", SettingSelectors[TYPE_TABLE] )
-	SettingAdd:SetText( "Add" )
+	SettingAdd:SetText( _G[addon].Msgs.AdminMenu.Add or "Add" )
 	SettingAdd:SetPos( 210, 30)
 	SettingAdd:SetSize( 55, 20 )
 

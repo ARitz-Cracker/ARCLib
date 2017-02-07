@@ -40,7 +40,7 @@ function ARCLib.SafeFileName(str) -- fucking WINDOWS and its utf-16 BULLSHIT tha
 				b = b - 126
 			end
 			local c = string.char(b)
-			if invalidFsChars[b] then
+			if invalidFsChars[b] or b < 32 then
 				newstr = newstr .. "_"
 			else
 				newstr = newstr .. (ARCLib.utf8_uc_lc[c] or c)

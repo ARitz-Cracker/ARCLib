@@ -27,21 +27,21 @@ file.CreateDir("arclib_cache/icons/32g")
 
 ARCLib._WebIcons16 = {}
 for k, v in pairs(file.Find( "arclib_cache/icons/16/*.png", "DATA" )) do
-	ARCLib._WebIcons16[string.sub( v, 1, #v-4 )] = Material ("../data/arclib_cache/icons/16/"..v, "nocull")
+	ARCLib._WebIcons16[string.sub( v, 1, #v-4 )] = Material ("../data/arclib_cache/icons/16/"..v, "nocull smooth")
 end
 ARCLib._WebIcons32 = {}
 for k, v in pairs(file.Find( "arclib_cache/icons/32/*.png", "DATA" )) do
 	MsgN("../data/arclib_cache/icons/32/"..v)
-	ARCLib._WebIcons32[string.Replace(v,".png","")] = Material ("../data/arclib_cache/icons/32/"..v, "nocull")
+	ARCLib._WebIcons32[string.Replace(v,".png","")] = Material ("../data/arclib_cache/icons/32/"..v, "nocull smooth")
 end
 
 ARCLib._WebIcons16Gray = {}
 for k, v in pairs(file.Find( "arclib_cache/icons/16g/*.png", "DATA" )) do
-	ARCLib._WebIcons16Gray[string.sub( v, 1, #v-4 )] = Material ("../data/arclib_cache/icons/16g/"..v, "nocull")
+	ARCLib._WebIcons16Gray[string.sub( v, 1, #v-4 )] = Material ("../data/arclib_cache/icons/16g/"..v, "nocull smooth")
 end
 ARCLib._WebIcons32Gray = {}
 for k, v in pairs(file.Find( "arclib_cache/icons/32g/*.png", "DATA" )) do
-	ARCLib._WebIcons32Gray[string.Replace(v,".png","")] = Material ("../data/arclib_cache/icons/32g/"..v, "nocull")
+	ARCLib._WebIcons32Gray[string.Replace(v,".png","")] = Material ("../data/arclib_cache/icons/32g/"..v, "nocull smooth")
 end
 
 local function GetIconFromInterwebs(tab,dirname,urlname,iconname,retries)
