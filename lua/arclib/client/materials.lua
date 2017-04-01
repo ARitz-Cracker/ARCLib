@@ -3,6 +3,11 @@ for k, v in pairs(file.Find( "materials/icon16/*.png", "GAME" )) do
 	ARCLib.Icons16[string.sub(v,1,-5)] = Material ("icon16/"..v, "nocull")
 end
 
+ARCLib.FlatIcons64 = {} -- Some of my addons use falticons! :D
+for k, v in pairs(file.Find( "materials/arc_flaticons/*.vmt", "GAME" )) do
+	ARCLib.FlatIcons64[string.sub(v,1,-5)] = surface.GetTextureID("arc_flaticons/"..string.Replace(v,".vmt",""))
+end
+
 -- Returns a material based on a file in the /data folder. TODO: Is the typ paramitar required?
 function ARCLib.MaterialFromTxt(mat,typ,param)
 	ErrorNoHalt( "ARCLib.MaterialFromTxt is depreciated as GMod now allows for images to be written in the data folder." )
