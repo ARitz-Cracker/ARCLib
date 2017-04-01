@@ -328,7 +328,6 @@ end
 
 -- The following 2 functions do the same thing, they are mostly used by my 3D2D displays when I want to fit something in a box. One tries to do it all within the same frame, the other one does it in chunks so the game doesn't freeze.
 
-
 local function ARCLib_CorrectStringTooLargeForTable(word,tab,place,font,length)
 	local temptables = {}
 	local tempstr = ""
@@ -381,8 +380,8 @@ function ARCLib.FitText(text,font,length,incoroutine)
 	surface.SetFont( font )
 	local spacelen = surface.GetTextSize( " " )
 	for k,v in utf8.codes( text ) do
-		v = utf8.char(v)
-		if (v == " ") then
+		vch = utf8.char(v)
+		if (vch == " ") then
 			--MsgN("curplace = "..curplace)
 			--PrintTable(resulttab)
 			currentlinesize = surface.GetTextSize( resulttab[curplace] )
@@ -398,7 +397,7 @@ function ARCLib.FitText(text,font,length,incoroutine)
 				resulttab[curplace] = currentword
 			end
 			currentword = ""
-		elseif (v == "\n") then
+		elseif (vch == "\n") then
 			currentlinesize = surface.GetTextSize( resulttab[curplace] )
 			currentwordsize = surface.GetTextSize( currentword )
 			if (currentwordsize > length) then -- WORD IS LONGER THAN THE LENGTH OF THE SCREEN AAAAAAAAAAAAAAAAH
@@ -415,10 +414,10 @@ function ARCLib.FitText(text,font,length,incoroutine)
 			resulttab[curplace] = ""
 			currentword = ""
 		else
-			currentword = currentword..v
+			currentword = currentword..vch
 		end
 		if incoroutine then
-			textprogress = textprogress + #v
+			textprogress = textprogress + #vch
 			ARCLib.CR.Progress = textprogress/textlen
 			coroutine.yield()
 		end

@@ -17,6 +17,14 @@ function ARCLib.TableHasValueCached(tab,val)
 	end
 	return CachedTables[tab][val] == true
 end
+function ARCLib.TableFillGapInsert(tab,val)
+	local i = 1
+	while tab[i] ~= nil do
+		i = i + 1
+	end
+	tab[i] = val
+	return i
+end
 
 function ARCLib.TableMergeOptimized( dest, source ) -- Slightly more optimized version of table.Marge (except it makes both tables equal to each other...)
 	for k, v in pairs( dest ) do

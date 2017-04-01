@@ -42,6 +42,9 @@ function ARCLib.UpdateAddonSetting(addon,setting,ply)
 		if setting == "language" then
 			ARCLib.SetAddonLanguage(addon)
 		end
+		if _G[addon].OnSettingChanged then
+			_G[addon].OnSettingChanged(setting,_G[addon].Settings[setting])
+		end
 	end
 end
 

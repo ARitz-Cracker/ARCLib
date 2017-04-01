@@ -49,8 +49,11 @@ if CLIENT then
 	net.Receive( "ARCLib_ModelAnimation", function(length)
 		net.ReadEntity():ARCLib_SetAnimationID(net.ReadInt(32),net.ReadDouble(32),net.ReadBool())
 	end)
+	hook.Add("OnEntityCreated","ARCLib_ModelAnimations",function(ent)
+		ent._ARCLib_Animation = false -- This apparently optimizes the function below
+	end)
 	hook.Add("Think","ARCLib_ModelAnimations",function()
-		for k,v in pairs(ents.GetAll()) do
+		for k,v in ipairs(ents.GetAll()) do
 			if v._ARCLib_Animation then
 				local rawtime = ((v._ARCLib_AnimEndTime - CurTime())/v._ARCLib_AnimScale-1)*-1
 				if rawtime > 1 then
@@ -59,7 +62,7 @@ if CLIENT then
 						rawtime = rawtime - 1
 					else
 						v._ARCLib_AnimLoop = nil
-						v._ARCLib_Animation = nil
+						v._ARCLib_Animation = false
 						v._ARCLib_AnimEndTime = nil
 						v._ARCLib_AnimScale = nil
 						v._ARCLib_AnimTime = nil

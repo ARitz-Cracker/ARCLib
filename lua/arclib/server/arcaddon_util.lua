@@ -97,7 +97,7 @@ function ARCLib.LoadDefaultLanguages(addon,url,callback,retries)
 							callback()
 						end,
 						function( err )
-							ARCLib.Msg("Failed to connect to "..url)
+							ARCLib.Msg("Failed to connect to "..v)
 							callback()
 						end
 					)

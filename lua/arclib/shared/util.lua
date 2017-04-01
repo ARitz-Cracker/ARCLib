@@ -155,6 +155,18 @@ function ARCLib.IsVersion(version,addon)
 	end
 	return false
 end
+local keys = {}
+for i=BUTTON_CODE_NONE,BUTTON_CODE_LAST do
+	for k,v in pairs(_G) do
+		if isstring(k) and string.StartWith( k, "KEY_" ) and v == i then
+			keys[v] = string.sub( k, 5 )
+		end
+	end
+end
+function ARCLib.HumanReadableKey(key)
+	return keys[key] or "KEY_NONE"
+end
+
 
 if CLIENT then
 	net.Receive( "ARCLib_Notify", function(length)
