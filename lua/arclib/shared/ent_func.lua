@@ -18,10 +18,8 @@ end
 --For some reason, I couldn't get any of the pre-built animations functions in GMod to work, SO I HACKED MY OWN!
 
 if CLIENT then
+	local entitiesAnimating = {}
 	function entity:ARCLib_SetAnimationID(animid,time,loop)
-		self._ARCLib_Animation = true
-		--MsgN("AnimID: "..animid)
-		--MsgN("Time: "..time)
 		if time > 0 then
 			--MsgN()
 			self._ARCLib_AnimScale = time
@@ -37,6 +35,7 @@ if CLIENT then
 			self:SetSequence(animid)
 		end
 		self._ARCLib_AnimLoop = loop
+		table.insert(entitiesAnimating,self)
 	end
 	function entity:ARCLib_SetAnimation(anim,loop)
 		local animid, time = self:LookupSequence(anim)
@@ -49,12 +48,11 @@ if CLIENT then
 	net.Receive( "ARCLib_ModelAnimation", function(length)
 		net.ReadEntity():ARCLib_SetAnimationID(net.ReadInt(32),net.ReadDouble(32),net.ReadBool())
 	end)
-	hook.Add("OnEntityCreated","ARCLib_ModelAnimations",function(ent)
-		ent._ARCLib_Animation = false -- This apparently optimizes the function below
-	end)
 	hook.Add("Think","ARCLib_ModelAnimations",function()
-		for k,v in ipairs(ents.GetAll()) do
-			if v._ARCLib_Animation then
+		local k = #entitiesAnimating
+		while k > 0 do
+			local v = entitiesAnimating[k]
+			if IsValid(v) then
 				local rawtime = ((v._ARCLib_AnimEndTime - CurTime())/v._ARCLib_AnimScale-1)*-1
 				if rawtime > 1 then
 					if v._ARCLib_AnimLoop then
@@ -62,15 +60,18 @@ if CLIENT then
 						rawtime = rawtime - 1
 					else
 						v._ARCLib_AnimLoop = nil
-						v._ARCLib_Animation = false
 						v._ARCLib_AnimEndTime = nil
 						v._ARCLib_AnimScale = nil
 						v._ARCLib_AnimTime = nil
+						table.remove(entitiesAnimating,k)
 					end
 				end
 				v._ARCLib_AnimTime = math.Clamp(rawtime,0,1)
 				v:SetCycle( v._ARCLib_AnimTime  )
+			else
+				table.remove(entitiesAnimating,k)
 			end
+			k = k - 1
 		end
 	end)
 else
