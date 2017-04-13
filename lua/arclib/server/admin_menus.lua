@@ -213,6 +213,11 @@ function ARCLib.AddonLoadSettings(addon,backward)
 	else
 		_G[addon].Msg("No settings file found! Using defaults.")
 	end
+	if _G[addon].OnSettingChanged then
+		for k,v in pairs(_G[addon].Settings) do
+			_G[addon].OnSettingChanged(k,v)
+		end
+	end
 	ARCLib.SendAddonSettings(addon,player.GetHumans())
 end
 
