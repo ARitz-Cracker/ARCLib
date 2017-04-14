@@ -71,8 +71,11 @@ while i<=len do
 		if !installedAddons[ARCLib.Addons[i].depends[ii]] then
 			ARCLib.Msg("WARNING! "..ARCLib.Addons[i].name.." has an unmet dependency! ("..ARCLib.Addons[i].depends[ii]..") This addon will not be loaded!")
 			table.remove( ARCLib.Addons ,i )
-			i = i - 1
 			len = len - 1
+			
+			-- Now any other addon that depended on this cannot be loaded
+			i = 1
+			installedAddons[ARCLib.Addons[i].filename] = false
 			valid = false
 			break
 		end

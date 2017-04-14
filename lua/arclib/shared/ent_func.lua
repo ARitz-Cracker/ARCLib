@@ -35,7 +35,9 @@ if CLIENT then
 			self:SetSequence(animid)
 		end
 		self._ARCLib_AnimLoop = loop
-		table.insert(entitiesAnimating,self)
+		if not table.HasValue(entitiesAnimating,self) then
+			table.insert(entitiesAnimating,self)
+		end
 	end
 	function entity:ARCLib_SetAnimation(anim,loop)
 		local animid, time = self:LookupSequence(anim)
