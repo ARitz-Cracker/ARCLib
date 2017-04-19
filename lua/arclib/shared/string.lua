@@ -1,5 +1,25 @@
 -- String stuffs
 
+local hex={}
+for i=0,255 do
+    hex[string.format("%0x",i)]=string.char(i)
+    hex[string.format("%0X",i)]=string.char(i)
+end
+function ARCLib.DecodeURIComponent(s) -- Doesn't work with mixed cased things like "Fe"
+    return (s:gsub('%%(%x%x)',hex))
+end
+
+function ARCLib.DecodeURI(s)
+	local result = {}
+	local p = string.Explode( "&", s )
+	for i=1,#p do
+		local v = string.Explode( "=", p[i] )
+		result[v[1]] = v[2]
+	end
+	return result
+end
+
+
 function ARCLib.RandomString(len,arr)
 	local str = ""
 	for i=1,len do
