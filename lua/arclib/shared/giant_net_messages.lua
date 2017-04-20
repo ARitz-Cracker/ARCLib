@@ -63,7 +63,7 @@ if SERVER then
 			error("ARCLib.RegisterBigMessage: Argument #2 must be between 256 and 49152")
 		end
 		if chunklimit < 4 or chunklimit > 255 then
-			error("ARCLib.RegisterBigMessage: Argument #2 must be between 4 and 255")
+			error("ARCLib.RegisterBigMessage: Argument #3 must be between 4 and 255")
 		end
 		if bigMessageNames[name] then return end
 		bigMessageNames[name] = {}
