@@ -113,6 +113,7 @@ function ARCLib.PlayCachedURL(url,flags,callback)
 	local path = getPathTable(url)
 	if not path then
 		callback(nil,20,"URL is invalid") -- 20 is BASS_ERROR_ILLPARAM for bass.
+		return
 	end
 	local filepath = path[#path]
 	if file.Exists(filepath,"DATA") then
