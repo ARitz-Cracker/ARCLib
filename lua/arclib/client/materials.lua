@@ -5,7 +5,7 @@ end
 
 ARCLib.FlatIcons64 = {} -- Some of my addons use falticons! :D
 for k, v in pairs(file.Find( "materials/arc_flaticons/*.vmt", "GAME" )) do
-	ARCLib.FlatIcons64[string.sub(v,1,-5)] = surface.GetTextureID("arc_flaticons/"..string.Replace(v,".vmt",""))
+	ARCLib.FlatIcons64[string.sub(v,1,-5)] = surface.GetTextureID("arc_flaticons/"..string.sub(v,1,-5))
 end
 
 -- Returns a material based on a file in the /data folder. TODO: Is the typ paramitar required?

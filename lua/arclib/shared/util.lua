@@ -3,6 +3,9 @@
 local thinkFuncs = {}
 local thinkThreads = {}
 local thinkDefs = {}
+local thinkPasses = {}
+
+local toBeDeleted = {}
 
 hook.Add("Think","ARCLib Multithink",function()
 	for k,v in pairs(thinkFuncs) do
@@ -14,13 +17,18 @@ hook.Add("Think","ARCLib Multithink",function()
 	while SysTime() - stime < 0.004 do
 		local anyalive = false
 		for k,v in pairs(thinkThreads) do
+			if (thinkPasses[k]) then continue end -- I know continue is a GLua keyword, but when is ARCLib going to used in an enviroment outside of GMod anyway?
 			if (coroutine.status(v) == "dead") then
 				thinkThreads[k] = nil
 			else
 				anyalive = true
 				local succ,err = coroutine.resume(v)
-				if !succ then
-					ErrorNoHalt( "[ARCLib think failed!] "..thinkDefs[k].."\n\t"..err )
+				if succ then
+					if (err) then
+						thinkPasses[k] = true
+					end
+				else
+					ErrorNoHalt( "[ARCLib think failed!] "..thinkDefs[k].."\n\t"..err.."\n" )
 					thinkThreads[k] = nil
 				end
 			end
@@ -29,11 +37,33 @@ hook.Add("Think","ARCLib Multithink",function()
 			break
 		end
 	end
+	table.Empty(thinkPasses)
+	for k,v in pairs(toBeDeleted) do
+		if (thinkThreads[k] == nil) then
+			thinkFuncs[k] = nil
+			thinkDefs[k] = nil
+			toBeDeleted[k] = nil
+		end
+	end
 end)
+function ARCLib.GetThinkFuncs()
+	return thinkFuncs
+end
 
 function ARCLib.AddThinkFunc(name,func)
 	thinkFuncs[name] = func
-	thinkDefs[name] = debug.getinfo(func).source
+	local info = debug.getinfo(func)
+	thinkDefs[name] = info.source..":"..info.linedefined
+end
+function ARCLib.RemoveThinkFunc(name,force)
+	if (force) then
+		thinkThreads[name] = nil
+		thinkFuncs[name] = nil
+		thinkDefs[name] = nil
+		toBeDeleted[name] = nil
+	else
+		toBeDeleted[name] = true
+	end
 end
 
 -- Gets the IP of the server

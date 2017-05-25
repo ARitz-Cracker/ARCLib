@@ -92,6 +92,7 @@ function ARCLib.JSONSafe( t, done )
 		else
 			if ( type( v ) == "Vector" ) then
 				local x, y, z = v.x, v.y, v.z
+				if x == 0 then y = nil end
 				if y == 0 then y = nil end
 				if z == 0 then z = nil end
 				tbl[ k ] = { __type = "Vector", x = x, y = y, z = z }
@@ -102,12 +103,17 @@ function ARCLib.JSONSafe( t, done )
 				if r == 0 then r = nil end
 				tbl[ k ] = { __type = "Angle", p = p, y = y, r = r }
 			elseif ( type( v ) == "boolean" ) then
-				tbl[ k ] = { __type = "Bool", tostring( v ) }
+				tbl[ k ] = v --{ __type = "Bool", tostring( v ) }
 			elseif ( type( v ) == "number" ) then
 				--tbl[ k ] = { __type = "Number", tostring( v ) }
 				tbl[ k ] = v
 			elseif ( IsColor(v) ) then
-				tbl[ k ] = { __type = "Color", r = v.r, g = v.g, b = v.b, a= v.a }
+				local r, h, b, a = v.r, v.g, v.b, v.a
+				if r == 0 then r = nil end
+				if g == 0 then g = nil end
+				if b == 0 then b = nil end
+				if a == 0 then a = nil end
+				tbl[ k ] = { __type = "Color", r = r, g = g, b = b, a = a }
 			else
 				tbl[ k ] = tostring( v )
 			end
@@ -124,15 +130,15 @@ function ARCLib.UnJSONSafe( t, done )
 			done[ v ] = true
 			if ( v.__type ) then
 				if ( v.__type == "Vector" ) then
-					tbl[ k ] = Vector( v.x, v.y, v.z )
+					tbl[ k ] = Vector( v.x or 0, v.y or 0, v.z or 0)
 				elseif ( v.__type == "Angle" ) then
-					tbl[ k ] = Angle( v.p, v.y, v.r )
+					tbl[ k ] = Angle( v.p or 0, v.y or 0, v.r  or 0)
 				elseif ( v.__type == "Bool" ) then
 					tbl[ k ] = ( v[ 1 ] == "true" )
 				--elseif ( v.__type == "Number" ) then
 					--tbl[ k ] = tonumber( v[ 1 ] )
 				elseif ( IsColor(v) ) then
-					tbl[ k ] = Color( v.r, v.g, v.b , v.a )
+					tbl[ k ] = Color( v.r or 0, v.g or 0, v.b or 0, v.a or 0 )
 				end
 			else
 				tbl[ k ] = table.DeSanitise( v, done )
