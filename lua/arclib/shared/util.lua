@@ -107,25 +107,41 @@ function ARCLib.AddDir(dir) -- recursively adds everything in a directory to be 
 end
 
 
+local forEachTabs = {}
 function ARCLib.ForEachAsync(tab,func,done)
 	local total = 0;
-	local progess = 0;
 	for k,v in pairs(tab) do
 		total = total + 1;
 	end
 	if (total == 0) then
 		timer.Simple(0,done)
 	else
+		table.insert(forEachTabs,{tab,func,done,total})
+	end
+end
+ARCLib.AddThinkFunc("ARCLib ForEachAsync",function()
+	local i = 0
+	while i < #forEachTabs do
+		i = i + 1
+		local tab = forEachTabs[i][1]
+		local func = forEachTabs[i][2]
+		local done = forEachTabs[i][3]
+		local total = forEachTabs[i][4]
+		local progress = 0
 		for k,v in pairs(tab) do
 			func(k,v,function()
-				progess = progess + 1
-				if (progess==total) then
+				progress = progress + 1
+				if (progress==total) then
 					timer.Simple(0,done)
 				end
 			end)
+			coroutine.yield()
 		end
 	end
-end
+	if i > 0 then
+		table.Empty(forEachTabs)
+	end
+end)
 
 function ARCLib.RGBToCMY(col)
 	return {c = (1 - col.r / 255)*255,m = (1 - col.g / 255)*255,y = (1 - col.b / 255)*255,a = col.a}
