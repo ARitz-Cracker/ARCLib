@@ -29,6 +29,11 @@ hook.Add( "RenderScene", "ARCLib RenderRTs", function( wat, skybox )
 
 		for k, v in pairs( RTs ) do
 			if v.Update then
+				if isfunction(v.FuncPos) then
+					local pos,ang = v.FuncPos()
+					v.renderInformation.origin = pos or v.renderInformation.origin or vector_origin
+					v.renderInformation.angles = ang or v.renderInformation.angles or angle_zero
+				end
 				render.PushRenderTarget( v.RenderTarget, 0, 0, v.renderInformation.w, v.renderInformation.h ) 
 				render.Clear( 0, 0, 0, 255, true, true )
 					if v.Func then
@@ -56,6 +61,7 @@ hook.Add( "RenderScene", "ARCLib RenderRTs", function( wat, skybox )
 							w = v.renderInformation.w,
 							x = v.renderInformation.x,
 							y = v.renderInformation.y,
+							alpha = false
 						}))
 						v.Screenie = nil
 						v.ScreenieFormat = nil
@@ -114,6 +120,9 @@ function RT_OBJECT:SetFunc3D(func)
 end
 function RT_OBJECT:SetPos(pos)
 	ARCLib.SetRenderTargetPos(self.name,pos)
+end
+function RT_OBJECT:SetPosCallback(func)
+	 ARCLib.SetRenderTargetPosCallback(self.name,func)
 end
 function RT_OBJECT:SetAngles(ang)
 	ARCLib.SetRenderTargetAngles(self.name,ang)
@@ -189,6 +198,9 @@ function ARCLib.SetRenderTargetFunc3D(name,func)
 end
 function ARCLib.SetRenderTargetFunc2D(name,func)
 	RTs[name].Func2D = func
+end
+function ARCLib.SetRenderTargetPosCallback(name,func)
+	RTs[name].FuncPos = func
 end
 
 function ARCLib.SetRenderTargetPos(name,pos)

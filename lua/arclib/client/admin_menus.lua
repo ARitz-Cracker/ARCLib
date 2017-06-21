@@ -206,7 +206,9 @@ function ARCLib.AddonConfigMenu(addon,cmd)
 		elseif typ == TYPE_STRING then
 			SettingSelectors[TYPE_STRING]:SetValue( settings[setting] )
 			SettingSelectors[TYPE_STRING].OnKeyCodeTyped = function( pan, val )
-				RunConsoleCommand( cmd,"settings",setting,SettingSelectors[TYPE_STRING]:GetValue())
+				timer.Simple(0,function()
+					RunConsoleCommand( cmd,"settings",setting,SettingSelectors[TYPE_STRING]:GetValue())
+				end)
 			end
 			SettingSelectors[TYPE_STRING].OnEnter = function()
 				RunConsoleCommand( cmd, "settings",setting,SettingSelectors[TYPE_STRING]:GetValue())

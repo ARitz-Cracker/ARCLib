@@ -3,7 +3,7 @@ NULLFUNC = function(...) end
 function ARCLib.Msg(msg)
 	Msg("ARCLib: "..tostring(msg).."\n")
 end
-ARCLib.Version = "1.7.3b"
+ARCLib.Version = "1.7.4"
 ARCLib.Update = "May 26th 2017"
 ARCLib.Msg("ARitz Cracker's Libraries")
 ARCLib.Msg(table.Random({"My pile-o-spaghetti-code","This library assumes a lot about the addon it loads, doesn't it?","Maybe other people will find this useful.","[Insert witty message here]","These little messages are tradition!"}))
