@@ -2,12 +2,9 @@
 
 -- The following code calls a hook on both the client and the server. No built-in hooks seem to be called right when the Sending Client Info process is complete.
 if CLIENT then
-	hook.Add( "Think", "ARCLib_FullyLoadedConfirm", function()
-		if IsValid(LocalPlayer()) then
-			net.Start("ARCLib_FullyLoaded")
-			net.SendToServer()
-			hook.Remove( "Think", "ARCLib_FullyLoadedConfirm") 
-		end
+	hook.Add( "InitPostEntity", "ARCLib_FullyLoadedConfirm", function()
+		net.Start("ARCLib_FullyLoaded")
+		net.SendToServer()
 	end)
 	net.Receive( "ARCLib_FullyLoaded", function(length)
 		local ply = net.ReadEntity()

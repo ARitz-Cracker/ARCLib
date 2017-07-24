@@ -1,3 +1,83 @@
+local PANEL = {}
+
+AccessorFunc( PANEL, "m_fFraction", "Fraction" )
+
+Derma_Hook( PANEL, "Paint", "Paint", "Progress" )
+
+function PANEL:Init()
+	self:SetMouseInputEnabled( false )
+	self:SetFraction( 0 )
+end
+local oldPaint = PANEL.Paint
+function PANEL:Paint(w,h)
+	if (self.endStart) then
+	
+		self.m_fFraction = self.endProgress + (ARCLib.BetweenNumberScale(self.endStart,SysTime(),self.endEnd)^2)*self.endMul
+		if (SysTime() > self.endEnd) then
+			self.m_fFraction = 1
+			self.t = nil
+			self.endProgress = nil
+			self.endMul = nil
+			self.endStart = nil
+			self.endEnd = nil
+			if isfunction(self.callback) then
+				self.callback()
+			end
+		end
+	elseif (self.t) then
+		--print(SysTime()-self.t)
+		self.m_fFraction = self:ProgressFunc(SysTime()-self.t)
+		--print(self.m_fFraction)
+	end
+	oldPaint(self,w,h)
+end
+function PANEL:StartProgress()
+	self.t = SysTime()
+	self.endStart = nil
+end
+function PANEL:StopProgress(t,cb)
+	self.callback = cb
+	self.endProgress = self.m_fFraction
+	self.endMul = 1 - self.endProgress
+	self.endStart = SysTime()
+	self.endEnd = self.endStart + (tonumber(t) or 1)
+end
+
+-- Found by playing with a graphing calculator
+function PANEL:ProgressFunc(x)
+	return (((x+100)^2)-10000)/((x+100)^2)
+end
+-- Derivative of above function
+function PANEL:ProgressFuncDeriv(x)
+	return 20000/((x+100)^3)
+end
+
+derma.DefineControl( "DProgressFake", "", PANEL, "Panel" )
+
+--[[]
+local p
+function ARCLib.Derma_Progress()
+	local Window = vgui.Create( "DFrame" )
+	Window:SetTitle( "aa" )
+	Window:SetDraggable( true )
+	Window:ShowCloseButton( true )
+	Window:SetSize( 200, 20 + 25 + 75 + 10 )
+	Window:Center()
+	Window:MakePopup()
+	p = vgui.Create( "DProgressFake", Window )
+	p:StretchToParent( 5, nil, 5, nil )
+	p:AlignBottom( 5 )
+	p:StartProgress()
+end
+
+function ARCLib.Derma_ProgressStop(t)
+	p:StopProgress(t,function()
+		print("done!")
+	end)
+end
+--]]
+
+
 function ARCLib.Derma_NumberRequest( strTitle, strText, numMin, numMax, numDefault, fnEnter, fnCancel, strButtonText, strButtonCancelText )
 	numMin = numMin or 0
 	numMax = numMax or 100

@@ -7,14 +7,22 @@ local thinkPasses = {}
 
 local toBeDeleted = {}
 
-hook.Add("Think","ARCLib Multithink",function()
+local lastTime = 0
+local interval = engine.TickInterval()
+local maxTime = interval*0.25 -- This value was chosen as a result of a lot of and trail-and error.
+-- Honeslty, if GMod Lua had proper async operations, I wouldn't feel the need to do this. Imagine if all expensive operations like traces and file IO were async that'd be great...
+-- Yet here I am, attempting to distribute the workload for my addons across ticks. 
+
+local tickTime = maxTime
+hook.Add("Tick","ARCLib Multithink",function()
+	local stime = SysTime()
 	for k,v in pairs(thinkFuncs) do
 		if !thinkThreads[k] then -- Check if it's dead here too?
 			thinkThreads[k] = coroutine.create(v) 
 		end
 	end
-	local stime = SysTime()
-	while SysTime() - stime < 0.004 do
+	
+	while SysTime() - stime < tickTime do
 		local anyalive = false
 		for k,v in pairs(thinkThreads) do
 			if (thinkPasses[k]) then continue end -- I know continue is a GLua keyword, but when is ARCLib going to used in an enviroment outside of GMod anyway?
@@ -45,6 +53,21 @@ hook.Add("Think","ARCLib Multithink",function()
 			toBeDeleted[k] = nil
 		end
 	end
+	local a = interval-(stime-lastTime)
+
+	tickTime = tickTime + a
+	if tickTime > maxTime then
+		tickTime = maxTime
+	elseif tickTime < 0 then
+		tickTime = 0.00001
+	end
+	--[[
+	print("interval:",interval)
+	print("tickTime:",tickTime)
+	print("thinks:",SysTime()-stime)
+	print("actual:",stime-lastTime)
+	--]]
+	lastTime = stime
 end)
 function ARCLib.GetThinkFuncs()
 	return thinkFuncs
