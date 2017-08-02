@@ -15,6 +15,12 @@ local maxTime = interval*0.25 -- This value was chosen as a result of a lot of a
 
 local tickTime = maxTime
 hook.Add("Tick","ARCLib Multithink",function()
+	if (coroutine.running()) then
+		print("SOMETHING WENT HORRIBLY WRONG WE SHOULDN'T BE IN A COROUTINE!! AAAAAAAAAAAAAAAAAAAAAAAAAAA")
+		hook.Remove("Tick","ARCLib Multithink")
+		return
+	end
+	
 	local stime = SysTime()
 	for k,v in pairs(thinkFuncs) do
 		if !thinkThreads[k] then -- Check if it's dead here too?
@@ -25,7 +31,7 @@ hook.Add("Tick","ARCLib Multithink",function()
 	while SysTime() - stime < tickTime do
 		local anyalive = false
 		for k,v in pairs(thinkThreads) do
-			if (thinkPasses[k]) then continue end -- I know continue is a GLua keyword, but when is ARCLib going to used in an enviroment outside of GMod anyway?
+			if (thinkPasses[k]) then continue end -- I know continue is a GLua keyword, but when is ARCLib going to used in an environment outside of GMod anyway?
 			if (coroutine.status(v) == "dead") then
 				thinkThreads[k] = nil
 			else
@@ -193,6 +199,7 @@ function ARCLib.IsVersion(version,addon)
 	
 	
 	addon = addon or "ARCLib"
+	if type(_G[addon]) != "table" then return false end
 	local currentversion = _G[addon].Version
 	if type(currentversion) != "string" then return false end
 	local vertab = {string.match(version,"([0-9]*).([0-9]*).([0-9]*)")}
