@@ -108,7 +108,7 @@ function ARCLib.GetIcon(t,name)
 		tab[name] = ARCLib.Icons16["bullet_blue"]
 	end
 	local dirname = "arclib_cache/icons/"
-	local urlname = "https://update.aritzcracker.ca/fatcow_icons"
+	local urlname = "https://elur1.bste.ca/fatcow_icons"
 	if t == 1 then
 		dirname = dirname .. "16/"
 		urlname = urlname .. "/16/"
